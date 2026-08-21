@@ -112,6 +112,25 @@ const GlobalStyle = () => (
     .pf-input:focus { border-color: var(--accent); }
     .pf-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
     .pf-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+    /* ---------- transitions ---------- */
+    @keyframes pf-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pf-modal-in { from { opacity: 0; transform: scale(0.96) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes pf-modal-out { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.97) translateY(6px); } }
+    @keyframes pf-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pf-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+
+    .pf-page-transition { animation: pf-fade-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .pf-card-in { animation: pf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .pf-modal-backdrop { animation: pf-backdrop-in 0.2s ease both; }
+    .pf-modal-backdrop.closing { animation: pf-backdrop-out 0.18s ease both; }
+    .pf-modal-panel { animation: pf-modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .pf-modal-panel.closing { animation: pf-modal-out 0.18s ease both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pf-page-transition, .pf-card-in, .pf-modal-backdrop, .pf-modal-panel { animation: none !important; }
+    }
   `}</style>
 );
 
@@ -243,10 +262,14 @@ const CategoryIcon = ({ id, size = 14 }) => {
   return <Icon size={size} strokeWidth={1.75} />;
 };
 
-function ProjectCard({ project, onOpen }) {
+function ProjectCard({ project, onOpen, index = 0 }) {
   const thumb = thumbnailOf(project);
   return (
-    <div className="pf-card" style={{ minWidth: 240, maxWidth: 240 }} onClick={() => onOpen(project)}>
+    <div
+      className="pf-card pf-card-in"
+      style={{ minWidth: 240, maxWidth: 240, animationDelay: `${Math.min(index, 8) * 40}ms` }}
+      onClick={() => onOpen(project)}
+    >
       <div style={{ height: 150, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {thumb ? <img src={thumb} alt={project.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={project.category} size={28} />}
       </div>
@@ -295,7 +318,7 @@ function Home({ meta, projects, setRoute, openProject }) {
         <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted)", marginBottom: 14 }}>// FEATURED</div>
         <div className="pf-scrollbar" style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8 }}>
           {featured.length === 0 && <div style={{ color: "var(--muted)" }}>No projects yet — add some from the admin panel.</div>}
-          {featured.map((p) => <ProjectCard key={p.id} project={p} onOpen={openProject} />)}
+          {featured.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
         </div>
       </div>
       {CATEGORIES.map((c) => {
@@ -308,7 +331,7 @@ function Home({ meta, projects, setRoute, openProject }) {
               <button className="pf-nav-tab" onClick={() => setRoute({ page: c.id })}>VIEW ALL <ArrowRight size={12} /></button>
             </div>
             <div className="pf-scrollbar" style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8 }}>
-              {items.map((p) => <ProjectCard key={p.id} project={p} onOpen={openProject} />)}
+              {items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
             </div>
           </div>
         );
@@ -355,7 +378,7 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
       </div>
       {items.length === 0 ? <div style={{ color: "var(--muted)" }}>No projects in this category yet.</div> : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 16 }}>
-          {items.map((p) => <ProjectCard key={p.id} project={p} onOpen={openProject} />)}
+          {items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
         </div>
       )}
       <Footer meta={meta} />
@@ -364,43 +387,55 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
 }
 
 function ProjectModal({ project, onClose }) {
-  if (!project) return null;
-  const groups = IMAGE_GROUPS[project.category] || [];
-  const imgs = project.images || [];
-  const hero = thumbnailOf(project);
+  const [closing, setClosing] = useState(false);
+  const [shown, setShown] = useState(project);
+
+  useEffect(() => {
+    if (project) { setShown(project); setClosing(false); }
+  }, [project]);
+
+  const handleClose = () => {
+    setClosing(true);
+    setTimeout(() => { setClosing(false); onClose(); }, 180);
+  };
+
+  if (!project && !closing) return null;
+  const p = shown;
+  if (!p) return null;
+  const groups = IMAGE_GROUPS[p.category] || [];
+  const imgs = p.images || [];
+  const hero = thumbnailOf(p);
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={onClose}>
-      <div className="pf-scrollbar" style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 920, width: "100%", maxHeight: "92vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+    <div className={`pf-modal-backdrop ${closing ? "closing" : ""}`} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={handleClose}>
+      <div className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 920, width: "100%", maxHeight: "92vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.95)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
-          <button className="pf-nav-tab" style={{ paddingLeft: 0 }} onClick={onClose}><ChevronLeft size={12} /> BACK</button>
-          <button className="pf-btn" onClick={onClose}><X size={14} /></button>
+          <button className="pf-nav-tab" style={{ paddingLeft: 0 }} onClick={handleClose}><ChevronLeft size={12} /> BACK</button>
+          <button className="pf-btn" onClick={handleClose}><X size={14} /></button>
         </div>
 
         {hero && (
           <div style={{ maxHeight: "50vh", minHeight: 200, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <img src={hero} alt={project.title} style={{ width: "100%", maxHeight: "50vh", objectFit: "contain" }} />
+            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "50vh", objectFit: "contain" }} />
           </div>
         )}
 
         <div style={{ padding: 28 }}>
-          <h3 className="pf-mono" style={{ fontSize: 24, margin: 0 }}>{project.title}</h3>
+          <h3 className="pf-mono" style={{ fontSize: 24, margin: 0 }}>{p.title}</h3>
           <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
-            <AiBadge used={project.ai_used} />
-            {project.date && <span className="pf-mono" style={{ fontSize: 11, color: "var(--muted)", border: "1px solid var(--line)", padding: "4px 8px" }}>{project.date}</span>}
+            <AiBadge used={p.ai_used} />
+            {p.date && <span className="pf-mono" style={{ fontSize: 11, color: "var(--muted)", border: "1px solid var(--line)", padding: "4px 8px" }}>{p.date}</span>}
           </div>
-          {project.ai_used && project.ai_note && <p style={{ fontSize: 13, color: "var(--ai-yes)", background: "var(--ai-yes-soft)", padding: "8px 10px", border: "1px solid rgba(255,159,67,0.3)" }}>{project.ai_note}</p>}
-          <p style={{ color: "var(--text)", lineHeight: 1.6, fontSize: 14, marginTop: 14, whiteSpace: "pre-wrap" }}>{project.description}</p>
-          {project.role && <p style={{ color: "var(--muted)", fontSize: 13 }}><strong style={{ color: "var(--text)" }}>Role:</strong> {project.role}</p>}
-          {project.tools?.length > 0 && (
+          {p.ai_used && p.ai_note && <p style={{ fontSize: 13, color: "var(--ai-yes)", background: "var(--ai-yes-soft)", padding: "8px 10px", border: "1px solid rgba(255,159,67,0.3)" }}>{p.ai_note}</p>}
+          <p style={{ color: "var(--text)", lineHeight: 1.6, fontSize: 14, marginTop: 14, whiteSpace: "pre-wrap" }}>{p.description}</p>
+          {p.role && <p style={{ color: "var(--muted)", fontSize: 13 }}><strong style={{ color: "var(--text)" }}>Role:</strong> {p.role}</p>}
+          {p.tools?.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-              {project.tools.map((t, i) => <span key={i} className="pf-mono" style={{ fontSize: 10, border: "1px solid var(--line)", padding: "4px 8px", color: "var(--muted)" }}>{t}</span>)}
+              {p.tools.map((t, i) => <span key={i} className="pf-mono" style={{ fontSize: 10, border: "1px solid var(--line)", padding: "4px 8px", color: "var(--muted)" }}>{t}</span>)}
             </div>
           )}
-          {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="pf-btn primary" style={{ marginTop: 20, textDecoration: "none" }}>View project <ExternalLink size={13} /></a>}
+          {p.link && <a href={p.link} target="_blank" rel="noreferrer" className="pf-btn primary" style={{ marginTop: 20, textDecoration: "none" }}>View project <ExternalLink size={13} /></a>}
 
-          {/* Category-specific image galleries (screenshots / process shots / general images) */}
           {groups.map((g) => {
-            // For "single" groups (cover) we already showed it as the hero image up top — skip repeating it.
             if (g.single) return null;
             const items = imgs.filter((i) => i.group === g.key);
             if (items.length === 0) return null;
@@ -418,11 +453,10 @@ function ProjectModal({ project, onClose }) {
             );
           })}
 
-          {/* PDF attachment (Other category) */}
-          {project.pdf_url && (
+          {p.pdf_url && (
             <div style={{ marginTop: 28 }}>
               <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 10 }}>ATTACHMENT</div>
-              <a href={project.pdf_url} target="_blank" rel="noreferrer" className="pf-btn" style={{ textDecoration: "none" }}>
+              <a href={p.pdf_url} target="_blank" rel="noreferrer" className="pf-btn" style={{ textDecoration: "none" }}>
                 <ExternalLink size={13} /> Open PDF
               </a>
             </div>
@@ -901,12 +935,14 @@ export default function App() {
         </div>
       )}
       {loadErr && <div className="pf-mono" style={{ background: "rgba(255,106,106,0.1)", color: "#FF6A6A", padding: "10px 20px", fontSize: 12, textAlign: "center" }}>Couldn't load data: {loadErr}</div>}
-      {route.page === "home" && <Home meta={meta} projects={projects} setRoute={setRoute} openProject={setActiveProject} />}
-      {CATEGORIES.some((c) => c.id === route.page) && <CategoryPage catId={route.page} projects={projects} openProject={setActiveProject} setRoute={setRoute} meta={meta} />}
-      {route.page === "skills" && <SkillsPage meta={meta} setRoute={setRoute} />}
-      {route.page === "about" && <AboutPage meta={meta} setRoute={setRoute} />}
-      {route.page === "contact" && <ContactPage meta={meta} setRoute={setRoute} />}
-      {route.page === "admin" && <Admin projects={projects} setProjects={wrappedSetProjects} meta={meta} setMeta={wrappedSetMeta} />}
+      <div key={route.page} className="pf-page-transition">
+        {route.page === "home" && <Home meta={meta} projects={projects} setRoute={setRoute} openProject={setActiveProject} />}
+        {CATEGORIES.some((c) => c.id === route.page) && <CategoryPage catId={route.page} projects={projects} openProject={setActiveProject} setRoute={setRoute} meta={meta} />}
+        {route.page === "skills" && <SkillsPage meta={meta} setRoute={setRoute} />}
+        {route.page === "about" && <AboutPage meta={meta} setRoute={setRoute} />}
+        {route.page === "contact" && <ContactPage meta={meta} setRoute={setRoute} />}
+        {route.page === "admin" && <Admin projects={projects} setProjects={wrappedSetProjects} meta={meta} setMeta={wrappedSetMeta} />}
+      </div>
       <ProjectModal project={activeProject} onClose={() => setActiveProject(null)} />
     </div>
   );
