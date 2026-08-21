@@ -394,6 +394,15 @@ function ProjectModal({ project, onClose }) {
     if (project) { setShown(project); setClosing(false); }
   }, [project]);
 
+  // Lock page scroll while the modal is open, so the background page
+  // doesn't scroll along with it — restore on close/unmount.
+  useEffect(() => {
+    if (!project) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prevOverflow; };
+  }, [project]);
+
   const handleClose = () => {
     setClosing(true);
     setTimeout(() => { setClosing(false); onClose(); }, 180);
@@ -408,8 +417,7 @@ function ProjectModal({ project, onClose }) {
   return (
     <div className={`pf-modal-backdrop ${closing ? "closing" : ""}`} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={handleClose}>
       <div className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 920, width: "100%", maxHeight: "92vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.95)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
-          <button className="pf-nav-tab" style={{ paddingLeft: 0 }} onClick={handleClose}><ChevronLeft size={12} /> BACK</button>
+        <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.95)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
           <button className="pf-btn" onClick={handleClose}><X size={14} /></button>
         </div>
 
