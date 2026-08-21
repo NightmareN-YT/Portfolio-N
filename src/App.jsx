@@ -130,8 +130,8 @@ const GlobalStyle = React.memo(() => (
       text-transform: uppercase; padding: 5px 9px; border-radius: 999px; border: 1px solid;
       white-space: nowrap;
     }
-    .pf-badge.yes { color: var(--ai-yes); background: var(--ai-yes-soft); border-color: rgba(247,178,103,0.35); }
-    .pf-badge.no { color: var(--ai-no); background: var(--ai-no-soft); border-color: rgba(112,224,184,0.34); }
+    .pf-badge.yes { color: #ffc27d; background: rgba(35, 27, 18, 0.94); border-color: rgba(247,178,103,0.62); box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
+    .pf-badge.no { color: #8af0c9; background: rgba(14, 37, 34, 0.94); border-color: rgba(112,224,184,0.58); box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
 
     .pf-card {
       background: rgba(18, 24, 33, 0.86);
@@ -298,12 +298,13 @@ const GlobalStyle = React.memo(() => (
     }
     .pf-project-card {
       width: 100%; border-radius: 18px; overflow: hidden; text-align: left;
-      background: linear-gradient(145deg, rgba(35, 40, 57, 0.98), rgba(18, 24, 33, 0.94) 55%, rgba(13, 16, 24, 0.98));
-      color: var(--text); border: 1px solid var(--line); cursor: pointer; padding: 0;
+      background: linear-gradient(145deg, rgba(35, 42, 58, 0.98), rgba(22, 29, 41, 0.98) 55%, rgba(17, 21, 30, 0.99));
+      color: var(--text); border: 1px solid rgba(164, 176, 201, 0.27); cursor: pointer; padding: 0;
       display: flex; flex-direction: column; height: 100%;
-      transition: transform 0.18s ease, border-color 0.18s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 14px 30px rgba(0,0,0,0.16);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
-    .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.5); }
+    .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.62); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 34px rgba(0,0,0,0.28); }
     .pf-project-visual {
       position: relative; width: 100%; height: 260px; overflow: hidden; background: #111827;
       border-bottom: 1px solid var(--line);
@@ -318,8 +319,9 @@ const GlobalStyle = React.memo(() => (
       display: flex; align-items: flex-end; justify-content: space-between; padding: 14px;
     }
     .pf-project-category {
-      color: var(--text); background: rgba(11,13,18,0.48); border: 1px solid rgba(255,255,255,0.08);
+      color: #f2f5fb; background: rgba(10, 13, 19, 0.9); border: 1px solid rgba(207,216,235,0.34);
       padding: 5px 8px; border-radius: 999px; font-size: 9px; letter-spacing: 0.08em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
     }
     .pf-project-body {
       padding: 16px 16px 18px; background: linear-gradient(180deg, rgba(30, 36, 51, 0.74), rgba(16, 21, 30, 0.92));
@@ -343,6 +345,15 @@ const GlobalStyle = React.memo(() => (
       border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px; color: var(--muted);
       background: rgba(255,255,255,0.02); font-size: 10px; letter-spacing: 0.06em;
     }
+    .pf-skill-tag { background: rgba(255,255,255,0.035); }
+    .pf-skill-tag.tone-0 { color: #a9c7ff; border-color: rgba(115,160,255,0.38); background: rgba(65,105,180,0.14); }
+    .pf-skill-tag.tone-1 { color: #8ce5d0; border-color: rgba(76,205,173,0.38); background: rgba(35,137,113,0.14); }
+    .pf-skill-tag.tone-2 { color: #e5b6ff; border-color: rgba(201,133,255,0.38); background: rgba(132,71,180,0.14); }
+    .pf-skill-tag.tone-3 { color: #ffd08f; border-color: rgba(255,181,93,0.4); background: rgba(165,103,36,0.14); }
+    .pf-home-skill-tag.tone-0 { color: #8f9fbd; border-color: rgba(115,140,185,0.26); background: rgba(65,105,180,0.08); }
+    .pf-home-skill-tag.tone-1 { color: #83b2a8; border-color: rgba(76,155,140,0.26); background: rgba(35,137,113,0.08); }
+    .pf-home-skill-tag.tone-2 { color: #ad91b9; border-color: rgba(155,112,180,0.26); background: rgba(132,71,180,0.08); }
+    .pf-home-skill-tag.tone-3 { color: #bca681; border-color: rgba(180,140,80,0.28); background: rgba(165,103,36,0.08); }
 
     .pf-capability-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
@@ -776,7 +787,7 @@ function Home({ meta, projects, setRoute, openProject }) {
           <button type="button" className="pf-nav-tab" onClick={() => setRoute({ page: "skills" })}>View all <ArrowRight size={12} /></button>
         </div>
         <div className="pf-skill-tags">
-          {skillsPreview.map((s, i) => <span key={i} className="pf-mono pf-tag">{s}</span>)}
+          {skillsPreview.map((s, i) => <span key={i} className={`pf-mono pf-tag pf-skill-tag pf-home-skill-tag tone-${i % 4}`}>{s}</span>)}
         </div>
       </section>
 
@@ -942,7 +953,7 @@ function SkillsPage({ meta, setRoute }) {
       {meta.skills.map((g, i) => (
         <section key={i} className="pf-skill-card">
           <div className="pf-mono pf-section-label" style={{ marginBottom: 12 }}>{g.group.toUpperCase()}</div>
-          <div className="pf-skill-tags">{g.items.map((s, j) => <span key={j} className="pf-mono pf-tag">{s}</span>)}</div>
+          <div className="pf-skill-tags">{g.items.map((s, j) => <span key={j} className={`pf-mono pf-tag pf-skill-tag tone-${i % 4}`}>{s}</span>)}</div>
         </section>
       ))}
     </div>
