@@ -30,6 +30,36 @@ const CATEGORIES = [
   { id: "other", label: "Other", short: "OTHER", icon: Sparkles },
 ];
 
+// Which image groups each category collects, in display order.
+// "single: true" groups only ever hold one image (used as the card thumbnail).
+const IMAGE_GROUPS = {
+  games: [
+    { key: "cover", label: "Cover Image", single: true },
+    { key: "screenshot", label: "Screenshots", single: false },
+  ],
+  blender: [
+    { key: "final", label: "Final Render", single: false },
+    { key: "process", label: "Process", single: false },
+  ],
+  "2d-art": [
+    { key: "final", label: "Final Render", single: false },
+    { key: "process", label: "Process", single: false },
+  ],
+  other: [
+    { key: "general", label: "Images", single: false },
+  ],
+};
+const thumbnailOf = (project) => {
+  const imgs = project.images || [];
+  return (
+    imgs.find((i) => i.group === "cover")?.url ||
+    imgs.find((i) => i.group === "final")?.url ||
+    imgs[0]?.url ||
+    project.image_url ||
+    ""
+  );
+};
+
 const DEFAULT_META = {
   name: "Your Name",
   role: "Creator / Developer",
@@ -147,12 +177,12 @@ async function sbLogin(email, password) {
   if (!res.ok) throw new Error(data.error_description || data.msg || "Login failed");
   return data.access_token;
 }
-async function sbUploadImage(file, token) {
-  const ext = file.type.includes("png") ? "png" : "jpg";
-  const path = `uploads/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+async function sbUploadFile(file, token, folder = "uploads") {
+  const safeExt = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${safeExt}`;
   const res = await fetch(`${STORAGE}/object/project-images/${path}`, {
     method: "POST",
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}`, "Content-Type": file.type },
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}`, "Content-Type": file.type || "application/octet-stream" },
     body: file,
   });
   if (!res.ok) throw new Error(await res.text());
@@ -197,10 +227,11 @@ const CategoryIcon = ({ id, size = 14 }) => {
 };
 
 function ProjectCard({ project, onOpen }) {
+  const thumb = thumbnailOf(project);
   return (
     <div className="pf-card" style={{ minWidth: 240, maxWidth: 240 }} onClick={() => onOpen(project)}>
       <div style={{ height: 150, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-        {project.image_url ? <img src={project.image_url} alt={project.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={project.category} size={28} />}
+        {thumb ? <img src={thumb} alt={project.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={project.category} size={28} />}
       </div>
       <div style={{ padding: 12 }}>
         <div className="pf-mono" style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{project.title}</div>
@@ -317,23 +348,31 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
 
 function ProjectModal({ project, onClose }) {
   if (!project) return null;
+  const groups = IMAGE_GROUPS[project.category] || [];
+  const imgs = project.images || [];
+  const hero = thumbnailOf(project);
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={onClose}>
-      <div className="pf-scrollbar" style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 640, width: "100%", maxHeight: "85vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ maxHeight: "60vh", minHeight: 180, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          {project.image_url ? <img src={project.image_url} alt={project.title} style={{ width: "100%", maxHeight: "60vh", objectFit: "contain" }} /> : <CategoryIcon id={project.category} size={40} />}
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={onClose}>
+      <div className="pf-scrollbar" style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 920, width: "100%", maxHeight: "92vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.95)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
+          <button className="pf-nav-tab" style={{ paddingLeft: 0 }} onClick={onClose}><ChevronLeft size={12} /> BACK</button>
+          <button className="pf-btn" onClick={onClose}><X size={14} /></button>
         </div>
-        <div style={{ padding: 24 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-            <h3 className="pf-mono" style={{ fontSize: 22, margin: 0 }}>{project.title}</h3>
-            <button className="pf-btn" onClick={onClose}><X size={14} /></button>
+
+        {hero && (
+          <div style={{ maxHeight: "50vh", minHeight: 200, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <img src={hero} alt={project.title} style={{ width: "100%", maxHeight: "50vh", objectFit: "contain" }} />
           </div>
+        )}
+
+        <div style={{ padding: 28 }}>
+          <h3 className="pf-mono" style={{ fontSize: 24, margin: 0 }}>{project.title}</h3>
           <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
             <AiBadge used={project.ai_used} />
             {project.date && <span className="pf-mono" style={{ fontSize: 11, color: "var(--muted)", border: "1px solid var(--line)", padding: "4px 8px" }}>{project.date}</span>}
           </div>
           {project.ai_used && project.ai_note && <p style={{ fontSize: 13, color: "var(--ai-yes)", background: "var(--ai-yes-soft)", padding: "8px 10px", border: "1px solid rgba(255,159,67,0.3)" }}>{project.ai_note}</p>}
-          <p style={{ color: "var(--text)", lineHeight: 1.6, fontSize: 14, marginTop: 14 }}>{project.description}</p>
+          <p style={{ color: "var(--text)", lineHeight: 1.6, fontSize: 14, marginTop: 14, whiteSpace: "pre-wrap" }}>{project.description}</p>
           {project.role && <p style={{ color: "var(--muted)", fontSize: 13 }}><strong style={{ color: "var(--text)" }}>Role:</strong> {project.role}</p>}
           {project.tools?.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
@@ -341,6 +380,36 @@ function ProjectModal({ project, onClose }) {
             </div>
           )}
           {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="pf-btn primary" style={{ marginTop: 20, textDecoration: "none" }}>View project <ExternalLink size={13} /></a>}
+
+          {/* Category-specific image galleries (screenshots / process shots / general images) */}
+          {groups.map((g) => {
+            // For "single" groups (cover) we already showed it as the hero image up top — skip repeating it.
+            if (g.single) return null;
+            const items = imgs.filter((i) => i.group === g.key);
+            if (items.length === 0) return null;
+            return (
+              <div key={g.key} style={{ marginTop: 28 }}>
+                <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 10 }}>{g.label.toUpperCase()}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 10 }}>
+                  {items.map((img, i) => (
+                    <a key={i} href={img.url} target="_blank" rel="noreferrer" style={{ display: "block", border: "1px solid var(--line)", overflow: "hidden" }}>
+                      <img src={img.url} alt={`${g.label} ${i + 1}`} style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* PDF attachment (Other category) */}
+          {project.pdf_url && (
+            <div style={{ marginTop: 28 }}>
+              <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 10 }}>ATTACHMENT</div>
+              <a href={project.pdf_url} target="_blank" rel="noreferrer" className="pf-btn" style={{ textDecoration: "none" }}>
+                <ExternalLink size={13} /> Open PDF
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -399,7 +468,7 @@ function ContactPage({ meta, setRoute }) {
 /* ============================================================
    ADMIN
    ============================================================ */
-const EMPTY_PROJECT = { title: "", category: "games", description: "", ai_used: false, ai_note: "", tools: [], role: "", date: "", link: "", image_url: "" };
+const EMPTY_PROJECT = { title: "", category: "games", description: "", ai_used: false, ai_note: "", tools: [], role: "", date: "", link: "", images: [], pdf_url: "" };
 
 function AdminLogin({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -448,26 +517,91 @@ function AdminLogin({ onLogin }) {
   );
 }
 
-function ProjectForm({ initial, token, onSave, onCancel }) {
-  const [form, setForm] = useState(initial || EMPTY_PROJECT);
-  const [toolsText, setToolsText] = useState((initial?.tools || []).join(", "));
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
+function ImageGroupField({ group, images, onAdd, onRemove, uploadingKey, onUpload }) {
+  const items = images.filter((i) => i.group === group.key);
   const fileRef = useRef();
+  const isUploading = uploadingKey === group.key;
 
   const handleFile = async (e) => {
     const file = e.target.files[0];
+    e.target.value = ""; // allow re-selecting the same file later
     if (!file) return;
-    setUploading(true); setErr("");
+    await onUpload(file, group.key, group.single);
+  };
+
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <label className="pf-label">{group.label}{group.single ? "" : " (add as many as you like)"}</label>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+        {items.map((img, i) => (
+          <div key={i} style={{ position: "relative" }}>
+            <img src={img.url} alt="" style={{ width: 72, height: 72, objectFit: "cover", border: "1px solid var(--line)" }} />
+            <button
+              onClick={() => onRemove(group.key, i)}
+              style={{ position: "absolute", top: -6, right: -6, background: "#FF6A6A", border: "none", borderRadius: "50%", width: 18, height: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <X size={11} color="#0B0D12" />
+            </button>
+          </div>
+        ))}
+      </div>
+      {(!group.single || items.length === 0) && (
+        <button className="pf-btn" onClick={() => fileRef.current.click()} disabled={isUploading}>
+          <Upload size={13} /> {isUploading ? "Uploading..." : `Upload ${group.single ? "image" : "image(s)"}`}
+        </button>
+      )}
+      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
+    </div>
+  );
+}
+
+function ProjectForm({ initial, token, onSave, onCancel }) {
+  const [form, setForm] = useState(initial || EMPTY_PROJECT);
+  const [toolsText, setToolsText] = useState((initial?.tools || []).join(", "));
+  const [uploadingKey, setUploadingKey] = useState(null);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+  const pdfRef = useRef();
+
+  const groups = IMAGE_GROUPS[form.category] || [];
+
+  const uploadToGroup = async (file, groupKey, single) => {
+    setUploadingKey(groupKey); setErr("");
     try {
       const compressed = await compressImage(file);
-      const url = await sbUploadImage(compressed, token);
-      setForm((f) => ({ ...f, image_url: url }));
+      const url = await sbUploadFile(compressed, token, "uploads");
+      setForm((f) => {
+        const others = single ? (f.images || []).filter((i) => i.group !== groupKey) : (f.images || []);
+        return { ...f, images: [...others, { url, group: groupKey }] };
+      });
     } catch (e2) {
       setErr("Image upload failed: " + e2.message);
     }
-    setUploading(false);
+    setUploadingKey(null);
+  };
+
+  const removeImage = (groupKey, index) => {
+    setForm((f) => {
+      const items = (f.images || []).filter((i) => i.group === groupKey);
+      const toRemove = items[index];
+      return { ...f, images: (f.images || []).filter((i) => i !== toRemove) };
+    });
+  };
+
+  const handlePdf = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.type !== "application/pdf") { setErr("Please choose a PDF file."); return; }
+    setUploadingPdf(true); setErr("");
+    try {
+      const url = await sbUploadFile(file, token, "attachments");
+      setForm((f) => ({ ...f, pdf_url: url }));
+    } catch (e2) {
+      setErr("PDF upload failed: " + e2.message);
+    }
+    setUploadingPdf(false);
   };
 
   const submit = async () => {
@@ -517,17 +651,41 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
           <input className="pf-input" value={form.ai_note} onChange={(e) => setForm({ ...form, ai_note: e.target.value })} placeholder="e.g. AI used for concept sketches only" />
         </div>
       )}
-      <div style={{ marginBottom: 18 }}>
-        <label className="pf-label">Image</label>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {form.image_url && <img src={form.image_url} alt="" style={{ width: 56, height: 56, objectFit: "cover", border: "1px solid var(--line)" }} />}
-          <button className="pf-btn" onClick={() => fileRef.current.click()} disabled={uploading}><Upload size={13} /> {uploading ? "Uploading..." : "Upload image"}</button>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
-        </div>
-        <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>Images are resized, compressed, and uploaded to your Supabase storage bucket.</p>
+
+      <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 4 }}>
+        {groups.map((g) => (
+          <ImageGroupField
+            key={g.key}
+            group={g}
+            images={form.images || []}
+            onAdd={() => {}}
+            onRemove={removeImage}
+            uploadingKey={uploadingKey}
+            onUpload={uploadToGroup}
+          />
+        ))}
+        <p style={{ fontSize: 11, color: "var(--muted)", marginTop: -6, marginBottom: 4 }}>Images are resized, compressed, and uploaded to your Supabase storage bucket.</p>
       </div>
-      {err && <div style={{ color: "#FF6A6A", fontSize: 12, marginBottom: 12 }}>{err}</div>}
-      <div style={{ display: "flex", gap: 10 }}>
+
+      {form.category === "other" && (
+        <div style={{ marginTop: 18 }}>
+          <label className="pf-label">PDF attachment (optional)</label>
+          {form.pdf_url ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <a href={form.pdf_url} target="_blank" rel="noreferrer" className="pf-mono" style={{ fontSize: 12, color: "var(--accent)" }}>View current PDF</a>
+              <button className="pf-btn danger" onClick={() => setForm({ ...form, pdf_url: "" })}><Trash2 size={12} /> Remove</button>
+            </div>
+          ) : (
+            <button className="pf-btn" onClick={() => pdfRef.current.click()} disabled={uploadingPdf}>
+              <Upload size={13} /> {uploadingPdf ? "Uploading..." : "Upload PDF"}
+            </button>
+          )}
+          <input ref={pdfRef} type="file" accept="application/pdf" style={{ display: "none" }} onChange={handlePdf} />
+        </div>
+      )}
+
+      {err && <div style={{ color: "#FF6A6A", fontSize: 12, marginTop: 16, marginBottom: 4 }}>{err}</div>}
+      <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button className="pf-btn primary" disabled={saving} onClick={submit}><Check size={13} /> {saving ? "Saving..." : "Save project"}</button>
         <button className="pf-btn" onClick={onCancel}>Cancel</button>
       </div>
@@ -567,7 +725,7 @@ function AdminProjects({ projects, setProjects, token }) {
           {projects.map((p) => (
             <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 14, border: "1px solid var(--line)", padding: 12, background: "var(--surface)" }}>
               <div style={{ width: 44, height: 44, background: "var(--surface-2)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {p.image_url ? <img src={p.image_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={p.category} size={18} />}
+                {thumbnailOf(p) ? <img src={thumbnailOf(p)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={p.category} size={18} />}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
