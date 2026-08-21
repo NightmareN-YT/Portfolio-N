@@ -159,13 +159,14 @@ async function sbUploadImage(file, token) {
   return `${SUPABASE_URL}/storage/v1/object/public/project-images/${path}`;
 }
 
-function compressImage(file, maxWidth = 900, quality = 0.75) {
+function compressImage(file, maxDimension = 1200, quality = 0.78) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const scale = Math.min(1, maxWidth / img.width);
+        const longEdge = Math.max(img.width, img.height);
+        const scale = Math.min(1, maxDimension / longEdge);
         const canvas = document.createElement("canvas");
         canvas.width = img.width * scale;
         canvas.height = img.height * scale;
@@ -319,8 +320,8 @@ function ProjectModal({ project, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={onClose}>
       <div className="pf-scrollbar" style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 640, width: "100%", maxHeight: "85vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ height: 260, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          {project.image_url ? <img src={project.image_url} alt={project.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={project.category} size={40} />}
+        <div style={{ maxHeight: "60vh", minHeight: 180, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          {project.image_url ? <img src={project.image_url} alt={project.title} style={{ width: "100%", maxHeight: "60vh", objectFit: "contain" }} /> : <CategoryIcon id={project.category} size={40} />}
         </div>
         <div style={{ padding: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
