@@ -297,11 +297,9 @@ const GlobalStyle = () => (
       border-bottom: 1px solid var(--line);
     }
     .pf-project-visual img {
-      position: absolute; inset: 0; width: 100%; height: 100%; display: block;
-      object-fit: cover; object-position: center center; transform: scale(1.035);
-      transition: transform 0.35s ease;
+      width: 100%; height: 100%; display: block; object-fit: cover; transition: transform 0.35s ease;
     }
-    .pf-project-card:hover .pf-project-visual img { transform: scale(1.075); }
+    .pf-project-card:hover .pf-project-visual img { transform: scale(1.04); }
     .pf-project-overlay {
       position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,8,12,0.12), rgba(7,8,12,0.52));
       display: flex; align-items: flex-end; justify-content: space-between; padding: 14px;
@@ -841,7 +839,7 @@ function ProjectModal({ project, onClose }) {
 
         {hero && (
           <div style={{ background: "linear-gradient(180deg, rgba(124,92,255,0.06), rgba(0,0,0,0))", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "contain", objectPosition: "center", display: "block" }} />
+            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "cover", display: "block" }} />
           </div>
         )}
 
