@@ -423,6 +423,10 @@ const GlobalStyle = () => (
     .pf-profile-manager-actions {
       display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px;
     }
+    .pf-nav-inner {
+      max-width: 1440px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center;
+      justify-content: space-between; gap: 18px; flex-wrap: wrap;
+    }
     .pf-profile-settings-grid {
       display: grid; gap: 16px;
     }
@@ -444,10 +448,24 @@ const GlobalStyle = () => (
       .pf-hero { gap: 28px; padding-top: 20px; }
       .pf-about-panel { flex-direction: column; align-items: flex-start; }
       .pf-profile-frame { max-width: 460px; margin: 0 auto; }
+      .pf-hero-copy { max-width: 720px; }
     }
 
     @media (max-width: 640px) {
+      .pf-nav-inner { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 16px; }
+      .pf-nav-inner > div:nth-child(2) { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; width: calc(100vw - 32px); }
+      .pf-nav-inner > button { justify-self: end; }
+      .pf-nav-tab { font-size: 10px; padding: 8px 10px; }
+      .pf-hero { padding: 28px 0 18px; margin-bottom: 26px; }
       .pf-hero-copy h1 { font-size: 42px; }
+      .pf-tagline { font-size: 17px; line-height: 1.45; }
+      .pf-lead { font-size: 14px; line-height: 1.7; }
+      .pf-stats { width: 100%; }
+      .pf-stat { padding: 14px 12px; }
+      .pf-stat-value { font-size: 18px; }
+      .pf-stat-label { font-size: 8px; }
+      .pf-status-row { max-width: 100%; font-size: 11px; }
+      .pf-profile-frame { min-height: 260px; }
       .pf-project-visual { height: 220px; }
       .pf-project-body h3 { font-size: 16px; }
       .pf-about-panel { padding: 18px; }
@@ -612,7 +630,7 @@ function Nav({ route, setRoute, meta }) {
   const tabs = [...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "skills", label: "SKILLS" }, { id: "about", label: "ABOUT" }, { id: "contact", label: "CONTACT" }];
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(11,13,18,0.82)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, flexWrap: "wrap" }}>
+      <div className="pf-nav-inner">
         <div className="pf-mono" style={{ fontWeight: 800, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onClick={() => setRoute({ page: "home" })}>
           <Terminal size={16} color="var(--accent)" /> {meta.name}
         </div>
@@ -654,7 +672,7 @@ function Home({ meta, projects, setRoute, openProject }) {
   const disciplineCount = new Set(projects.map((project) => project.category).filter(Boolean)).size;
 
   return (
-    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "56px 20px 40px" }}>
+    <div style={{ maxWidth: 1440, margin: "0 auto", padding: "56px 24px 40px" }}>
       <section className="pf-hero">
         <div className="pf-hero-copy">
           <div className="pf-mono pf-kicker">$ whoami --role="{meta.role}"</div>
@@ -766,7 +784,7 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
   items = [...items].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   return (
-    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 20px 60px" }}>
+    <div style={{ maxWidth: 1440, margin: "0 auto", padding: "40px 24px 60px" }}>
       <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 18 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
       <div className="pf-page-header">
         <div className="pf-page-header-label"><cat.icon size={18} /> <span className="pf-mono">{cat.short}</span></div>
@@ -880,7 +898,7 @@ function ProjectModal({ project, onClose }) {
 
 function SkillsPage({ meta, setRoute }) {
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 20px 60px" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 60px" }}>
       <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
       <div className="pf-page-header" style={{ marginBottom: 24 }}>
         <div className="pf-page-header-label"><Terminal size={16} /> <span className="pf-mono">Skills</span></div>
@@ -899,7 +917,7 @@ function SkillsPage({ meta, setRoute }) {
 function AboutPage({ meta, setRoute }) {
   const profile = getProfileImageConfig(meta);
   return (
-    <div style={{ maxWidth: 1020, margin: "0 auto", padding: "40px 20px 60px" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 60px" }}>
       <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
       <div className="pf-about-layout">
         <div className="pf-about-image-wrap">
