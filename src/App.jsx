@@ -297,10 +297,11 @@ const GlobalStyle = () => (
       border-bottom: 1px solid var(--line);
     }
     .pf-project-visual img {
-      width: 100%; height: 100%; display: block; object-fit: cover; object-position: center bottom;
+      position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+      object-fit: cover; object-position: center center; transform: scale(1.035);
       transition: transform 0.35s ease;
     }
-    .pf-project-card:hover .pf-project-visual img { transform: scale(1.04); }
+    .pf-project-card:hover .pf-project-visual img { transform: scale(1.075); }
     .pf-project-overlay {
       position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,8,12,0.12), rgba(7,8,12,0.52));
       display: flex; align-items: flex-end; justify-content: space-between; padding: 14px;
