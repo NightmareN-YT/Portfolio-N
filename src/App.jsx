@@ -839,7 +839,7 @@ function ProjectModal({ project, onClose }) {
 
         {hero && (
           <div style={{ background: "linear-gradient(180deg, rgba(124,92,255,0.06), rgba(0,0,0,0))", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "cover", display: "block" }} />
+            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "contain", objectPosition: "center", display: "block" }} />
           </div>
         )}
 
