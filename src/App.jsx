@@ -82,7 +82,7 @@ const DEFAULT_META = {
   ],
 };
 
-const GlobalStyle = () => (
+const GlobalStyle = React.memo(() => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -154,9 +154,15 @@ const GlobalStyle = () => (
     }
     .pf-nav-tab:hover { color: var(--text); border-color: var(--line); }
     .pf-nav-tab.active {
-      color: var(--text); border-color: var(--line); background: rgba(255,255,255,0.02);
+      color: var(--text); border-color: rgba(180, 190, 214, 0.38); background: rgba(255,255,255,0.04);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
     }
+    .pf-nav-divider {
+      width: 1px; height: 20px; align-self: center; background: rgba(190, 200, 224, 0.42); margin: 0 8px;
+      flex: 0 0 1px; opacity: 1;
+    }
+    .pf-nav-tab.secondary-nav { color: #687386; }
+    .pf-nav-tab.secondary-nav:hover, .pf-nav-tab.secondary-nav.active { color: var(--text); }
     .pf-btn {
       font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
       padding: 10px 16px; border: 1px solid var(--line); background: rgba(255,255,255,0.01);
@@ -171,6 +177,11 @@ const GlobalStyle = () => (
       border-color: transparent; color: #0f1220; font-weight: 700;
     }
     .pf-btn.danger:hover { border-color: rgba(255,107,107,0.7); color: #ffb4b4; }
+    .pf-pdf-link {
+      background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(139,92,246,0.12));
+      border-color: rgba(167,139,250,0.58); color: #ddd3ff; box-shadow: 0 8px 22px rgba(99,67,180,0.18);
+    }
+    .pf-pdf-link:hover { background: linear-gradient(135deg, rgba(167,139,250,0.3), rgba(139,92,246,0.2)); color: #fff; }
     .pf-input {
       width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--line);
       color: var(--text); padding: 10px 12px; font-size: 14px; outline: none; border-radius: 12px;
@@ -289,6 +300,7 @@ const GlobalStyle = () => (
       width: 100%; border-radius: 18px; overflow: hidden; text-align: left;
       background: linear-gradient(145deg, rgba(35, 40, 57, 0.98), rgba(18, 24, 33, 0.94) 55%, rgba(13, 16, 24, 0.98));
       color: var(--text); border: 1px solid var(--line); cursor: pointer; padding: 0;
+      display: flex; flex-direction: column; height: 100%;
       transition: transform 0.18s ease, border-color 0.18s ease;
     }
     .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.5); }
@@ -297,7 +309,8 @@ const GlobalStyle = () => (
       border-bottom: 1px solid var(--line);
     }
     .pf-project-visual img {
-      width: 100%; height: 100%; display: block; object-fit: cover; transition: transform 0.35s ease;
+      width: 100%; height: 100%; display: block; object-fit: cover;
+      transition: transform 0.35s ease;
     }
     .pf-project-card:hover .pf-project-visual img { transform: scale(1.04); }
     .pf-project-overlay {
@@ -310,6 +323,7 @@ const GlobalStyle = () => (
     }
     .pf-project-body {
       padding: 16px 16px 18px; background: linear-gradient(180deg, rgba(30, 36, 51, 0.74), rgba(16, 21, 30, 0.92));
+      display: flex; flex: 1; flex-direction: column;
     }
     .pf-project-head {
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
@@ -322,7 +336,7 @@ const GlobalStyle = () => (
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
     .pf-tool-row {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 14px;
     }
     .pf-tag {
       display: inline-flex; align-items: center; justify-content: center;
@@ -410,6 +424,13 @@ const GlobalStyle = () => (
     }
     .pf-modal-meta strong { color: var(--text); }
     .pf-meta-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pf-modal-hero {
+      background: linear-gradient(145deg, rgba(38, 44, 64, 0.9), rgba(10, 14, 22, 0.98));
+      border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .pf-modal-hero img {
+      width: 100%; height: auto; max-height: 68vh; display: block; object-fit: contain; object-position: center;
+    }
 
     .pf-contact-item { transition: border-color 0.18s ease, transform 0.18s ease; }
     .pf-contact-item:hover { border-color: rgba(167,139,250,0.5); }
@@ -466,6 +487,7 @@ const GlobalStyle = () => (
       .pf-stat-label { font-size: 8px; }
       .pf-status-row { max-width: 100%; font-size: 11px; }
       .pf-profile-frame { min-height: 260px; }
+      .pf-modal-hero img { max-height: 52vh; }
       .pf-project-visual { height: 220px; }
       .pf-project-body h3 { font-size: 16px; }
       .pf-about-panel { padding: 18px; }
@@ -473,7 +495,7 @@ const GlobalStyle = () => (
       .pf-btn, .pf-nav-tab { padding-left: 12px; padding-right: 12px; }
     }
   `}</style>
-);
+));
 
 const REST = `${SUPABASE_URL}/rest/v1`;
 const AUTH = `${SUPABASE_URL}/auth/v1`;
@@ -596,7 +618,7 @@ const CategoryIcon = ({ id, size = 14 }) => {
   return <Icon size={size} strokeWidth={1.75} />;
 };
 
-function ProjectCard({ project, onOpen, index = 0 }) {
+const ProjectCard = React.memo(function ProjectCard({ project, onOpen, index = 0 }) {
   const thumb = thumbnailOf(project);
   const cat = CATEGORIES.find((c) => c.id === project.category);
   const displayTools = (project.tools || []).slice(0, 3);
@@ -604,7 +626,7 @@ function ProjectCard({ project, onOpen, index = 0 }) {
   return (
     <button type="button" className="pf-project-card pf-card-in" style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }} onClick={() => onOpen(project)}>
       <div className="pf-project-visual">
-        {thumb ? <img src={thumb} alt={project.title} /> : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: "var(--muted)" }}><CategoryIcon id={project.category} size={28} /></div>}
+        {thumb ? <img src={thumb} alt={project.title} loading={index < 4 ? "eager" : "lazy"} decoding="async" /> : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: "var(--muted)" }}><CategoryIcon id={project.category} size={28} /></div>}
         <div className="pf-project-overlay">
           <span className="pf-mono pf-project-category">{cat ? cat.short : "PROJECT"}</span>
           <AiBadge used={project.ai_used} />
@@ -624,10 +646,15 @@ function ProjectCard({ project, onOpen, index = 0 }) {
       </div>
     </button>
   );
-}
+});
 
 function Nav({ route, setRoute, meta }) {
-  const tabs = [...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "skills", label: "SKILLS" }, { id: "about", label: "ABOUT" }, { id: "contact", label: "CONTACT" }];
+  const tabs = [
+    ...CATEGORIES.map((c) => ({ id: c.id, label: c.short, icon: c.icon })),
+    { id: "skills", label: "SKILLS" },
+    { id: "about", label: "ABOUT" },
+    { id: "contact", label: "CONTACT" },
+  ];
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(11,13,18,0.82)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
       <div className="pf-nav-inner">
@@ -635,7 +662,15 @@ function Nav({ route, setRoute, meta }) {
           <Terminal size={16} color="var(--accent)" /> {meta.name}
         </div>
         <div className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto", flex: 1, justifyContent: "center" }}>
-          {tabs.map((t) => <button key={t.id} className={`pf-nav-tab ${route.page === t.id ? "active" : ""}`} onClick={() => setRoute({ page: t.id })}>{t.label}</button>)}
+          {tabs.map((t, index) => (
+            <React.Fragment key={t.id}>
+              {index === CATEGORIES.length && <span className="pf-nav-divider" aria-hidden="true" />}
+              <button key={t.id} className={`pf-nav-tab ${index >= CATEGORIES.length ? "secondary-nav" : ""} ${route.page === t.id ? "active" : ""}`} onClick={() => setRoute({ page: t.id })}>
+                {t.icon && <t.icon size={13} strokeWidth={1.75} />}
+                {t.label}
+              </button>
+            </React.Fragment>
+          ))}
         </div>
         <button className="pf-nav-tab" onClick={() => setRoute({ page: "admin" })}><Lock size={12} /> ADMIN</button>
       </div>
@@ -838,8 +873,8 @@ function ProjectModal({ project, onClose }) {
         </div>
 
         {hero && (
-          <div style={{ background: "linear-gradient(180deg, rgba(124,92,255,0.06), rgba(0,0,0,0))", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "cover", display: "block" }} />
+          <div className="pf-modal-hero">
+            <img src={hero} alt={p.title} />
           </div>
         )}
 
@@ -874,7 +909,7 @@ function ProjectModal({ project, onClose }) {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 10 }}>
                   {items.map((img, i) => (
                     <a key={i} href={img.url} target="_blank" rel="noreferrer" style={{ display: "block", border: "1px solid var(--line)", overflow: "hidden", background: "var(--surface-2)" }}>
-                      <img src={img.url} alt={`${g.label} ${i + 1}`} style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
+                      <img src={img.url} alt={`${g.label} ${i + 1}`} loading="lazy" decoding="async" style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
                     </a>
                   ))}
                 </div>
@@ -885,8 +920,8 @@ function ProjectModal({ project, onClose }) {
           {p.pdf_url && (
             <div style={{ marginTop: 28 }}>
               <div className="pf-mono pf-section-label" style={{ marginBottom: 10 }}>Attachment</div>
-              <a href={p.pdf_url} target="_blank" rel="noreferrer" className="pf-btn" style={{ textDecoration: "none" }}>
-                <ExternalLink size={13} /> Open PDF
+              <a href={p.pdf_url} target="_blank" rel="noreferrer" className="pf-btn pf-pdf-link" style={{ textDecoration: "none" }}>
+                <ExternalLink size={18} strokeWidth={2.2} /> <span>Open PDF</span>
               </a>
             </div>
           )}
@@ -1067,6 +1102,8 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+  const [pendingDeleteUrls, setPendingDeleteUrls] = useState([]);
+  const [uploadedUrls, setUploadedUrls] = useState([]);
   const pdfRef = useRef();
 
   const groups = IMAGE_GROUPS[form.category] || [];
@@ -1077,11 +1114,12 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
       const compressed = await compressImage(file);
       const url = await sbUploadFile(compressed, token, "uploads");
       const oldOnes = single ? (form.images || []).filter((i) => i.group === groupKey) : [];
+      setUploadedUrls((urls) => [...urls, url]);
       setForm((f) => {
         const others = single ? (f.images || []).filter((i) => i.group !== groupKey) : (f.images || []);
         return { ...f, images: [...others, { url, group: groupKey }] };
       });
-      for (const old of oldOnes) await sbDeleteFile(old.url, token);
+      setPendingDeleteUrls((urls) => [...urls, ...oldOnes.map((old) => old.url)]);
     } catch (e2) {
       setErr("Image upload failed: " + e2.message);
     }
@@ -1093,7 +1131,12 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
     const toRemove = items[index];
     if (!toRemove) return;
     setForm((f) => ({ ...f, images: (f.images || []).filter((i) => i !== toRemove) }));
-    await sbDeleteFile(toRemove.url, token);
+    if (!uploadedUrls.includes(toRemove.url)) {
+      setPendingDeleteUrls((urls) => [...urls, toRemove.url]);
+    } else {
+      setUploadedUrls((urls) => urls.filter((url) => url !== toRemove.url));
+      await sbDeleteFile(toRemove.url, token);
+    }
   };
 
   const handlePdf = async (e) => {
@@ -1104,6 +1147,7 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
     setUploadingPdf(true); setErr("");
     try {
       const url = await sbUploadFile(file, token, "attachments");
+      setUploadedUrls((urls) => [...urls, url]);
       setForm((f) => ({ ...f, pdf_url: url }));
     } catch (e2) {
       setErr("PDF upload failed: " + e2.message);
@@ -1118,6 +1162,9 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
       const tools = toolsText.split(",").map((t) => t.trim()).filter(Boolean);
       const payload = { ...form, tools };
       await onSave(payload);
+      for (const url of pendingDeleteUrls) await sbDeleteFile(url, token);
+      setPendingDeleteUrls([]);
+      setUploadedUrls([]);
     } catch (e2) {
       setErr("Save failed: " + e2.message);
     }
@@ -1179,7 +1226,7 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
           {form.pdf_url ? (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <a href={form.pdf_url} target="_blank" rel="noreferrer" className="pf-mono" style={{ fontSize: 12, color: "var(--accent)" }}>View current PDF</a>
-              <button type="button" className="pf-btn danger" onClick={async () => { await sbDeleteFile(form.pdf_url, token); setForm({ ...form, pdf_url: "" }); }}><Trash2 size={12} /> Remove</button>
+              <button type="button" className="pf-btn danger" onClick={() => { setPendingDeleteUrls((urls) => [...urls, form.pdf_url]); setForm({ ...form, pdf_url: "" }); }}><Trash2 size={12} /> Remove</button>
             </div>
           ) : (
             <button type="button" className="pf-btn" onClick={() => pdfRef.current.click()} disabled={uploadingPdf}>
@@ -1193,7 +1240,10 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
       {err && <div style={{ color: "#FF6A6A", fontSize: 12, marginTop: 16, marginBottom: 4 }}>{err}</div>}
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button type="button" className="pf-btn primary" disabled={saving} onClick={submit}><Check size={13} /> {saving ? "Saving..." : "Save project"}</button>
-        <button type="button" className="pf-btn" onClick={onCancel}>Cancel</button>
+        <button type="button" className="pf-btn" onClick={async () => {
+          for (const url of uploadedUrls) await sbDeleteFile(url, token);
+          onCancel();
+        }}>Cancel</button>
       </div>
     </div>
   );
@@ -1237,7 +1287,7 @@ function AdminProjects({ projects, setProjects, token }) {
           {projects.map((p) => (
             <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 14, border: "1px solid var(--line)", padding: 12, background: "var(--surface)" }}>
               <div style={{ width: 44, height: 44, background: "var(--surface-2)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {thumbnailOf(p) ? <img src={thumbnailOf(p)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={p.category} size={18} />}
+                {thumbnailOf(p) ? <img src={thumbnailOf(p)} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={p.category} size={18} />}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
