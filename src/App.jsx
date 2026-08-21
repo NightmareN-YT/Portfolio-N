@@ -188,6 +188,23 @@ async function sbUploadFile(file, token, folder = "uploads") {
   if (!res.ok) throw new Error(await res.text());
   return `${SUPABASE_URL}/storage/v1/object/public/project-images/${path}`;
 }
+// Deletes the actual file in storage given its public URL. Best-effort —
+// failures here shouldn't block removing the reference from the project.
+async function sbDeleteFile(publicUrl, token) {
+  if (!publicUrl) return;
+  const marker = "/object/public/project-images/";
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return;
+  const path = publicUrl.slice(idx + marker.length);
+  try {
+    await fetch(`${STORAGE}/object/project-images/${path}`, {
+      method: "DELETE",
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    // ignore — file may already be gone, or network hiccup; not worth blocking the user over
+  }
+}
 
 function compressImage(file, maxDimension = 1200, quality = 0.78) {
   return new Promise((resolve, reject) => {
@@ -571,22 +588,25 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
     try {
       const compressed = await compressImage(file);
       const url = await sbUploadFile(compressed, token, "uploads");
+      const oldOnes = single ? (form.images || []).filter((i) => i.group === groupKey) : [];
       setForm((f) => {
         const others = single ? (f.images || []).filter((i) => i.group !== groupKey) : (f.images || []);
         return { ...f, images: [...others, { url, group: groupKey }] };
       });
+      // Clean up the file(s) being replaced so storage doesn't accumulate orphans
+      for (const old of oldOnes) await sbDeleteFile(old.url, token);
     } catch (e2) {
       setErr("Image upload failed: " + e2.message);
     }
     setUploadingKey(null);
   };
 
-  const removeImage = (groupKey, index) => {
-    setForm((f) => {
-      const items = (f.images || []).filter((i) => i.group === groupKey);
-      const toRemove = items[index];
-      return { ...f, images: (f.images || []).filter((i) => i !== toRemove) };
-    });
+  const removeImage = async (groupKey, index) => {
+    const items = (form.images || []).filter((i) => i.group === groupKey);
+    const toRemove = items[index];
+    if (!toRemove) return;
+    setForm((f) => ({ ...f, images: (f.images || []).filter((i) => i !== toRemove) }));
+    await sbDeleteFile(toRemove.url, token);
   };
 
   const handlePdf = async (e) => {
@@ -673,7 +693,7 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
           {form.pdf_url ? (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <a href={form.pdf_url} target="_blank" rel="noreferrer" className="pf-mono" style={{ fontSize: 12, color: "var(--accent)" }}>View current PDF</a>
-              <button className="pf-btn danger" onClick={() => setForm({ ...form, pdf_url: "" })}><Trash2 size={12} /> Remove</button>
+              <button className="pf-btn danger" onClick={async () => { await sbDeleteFile(form.pdf_url, token); setForm({ ...form, pdf_url: "" }); }}><Trash2 size={12} /> Remove</button>
             </div>
           ) : (
             <button className="pf-btn" onClick={() => pdfRef.current.click()} disabled={uploadingPdf}>
@@ -710,8 +730,15 @@ function AdminProjects({ projects, setProjects, token }) {
 
   const deleteProject = async (id) => {
     if (!confirm("Delete this project? This can't be undone.")) return;
+    const proj = projects.find((p) => p.id === id);
     await sbDelete("projects", id, token);
     setProjects(projects.filter((p) => p.id !== id));
+    // Clean up its images and PDF in storage too, so nothing is left orphaned
+    if (proj) {
+      for (const img of proj.images || []) await sbDeleteFile(img.url, token);
+      if (proj.image_url) await sbDeleteFile(proj.image_url, token);
+      if (proj.pdf_url) await sbDeleteFile(proj.pdf_url, token);
+    }
   };
 
   return (
