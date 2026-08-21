@@ -16,10 +16,6 @@ const Linkedin = ({ size = 16 }) => (
   </svg>
 );
 
-/* ============================================================
-   SUPABASE CONFIG — fill these in with YOUR project's values
-   Project Settings -> API -> Project URL / anon public key
-   ============================================================ */
 const SUPABASE_URL = "https://fktnbldkjgoouzsidraf.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrdG5ibGRramdvb3V6c2lkcmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyODI2ODgsImV4cCI6MjEwMjg1ODY4OH0.d6mSMFqwKMqSZEOw8aFqtxejJhHbfQeYTrdTvpdmSlY";
 
@@ -30,8 +26,6 @@ const CATEGORIES = [
   { id: "other", label: "Other", short: "OTHER", icon: Sparkles },
 ];
 
-// Which image groups each category collects, in display order.
-// "single: true" groups only ever hold one image (used as the card thumbnail).
 const IMAGE_GROUPS = {
   games: [
     { key: "cover", label: "Cover Image", single: true },
@@ -45,10 +39,9 @@ const IMAGE_GROUPS = {
     { key: "final", label: "Final Render", single: false },
     { key: "process", label: "Process", single: false },
   ],
-  other: [
-    { key: "general", label: "Images", single: false },
-  ],
+  other: [{ key: "general", label: "Images", single: false }],
 };
+
 const thumbnailOf = (project) => {
   const imgs = project.images || [];
   return (
@@ -66,7 +59,21 @@ const DEFAULT_META = {
   tagline: "Building games, 3D worlds, art, and AI-powered tools.",
   bio: "Write a short bio here about who you are, what you make, and how you work. Edit this from the admin panel.",
   email: "",
-  links: { github: "", linkedin: "", itch: "", artstation: "", other: "" },
+  links: {
+    github: "",
+    linkedin: "",
+    itch: "",
+    artstation: "",
+    other: "",
+    profile_image_url: "",
+    profile_image_style: "rounded_rectangle",
+    profile_image_aspect_ratio: "4:5",
+    profile_image_position: "center",
+  },
+  profile_image_url: "",
+  profile_image_style: "rounded_rectangle",
+  profile_image_aspect_ratio: "4:5",
+  profile_image_position: "center",
   skills: [
     { group: "Programming", items: ["JavaScript", "Python", "C#"] },
     { group: "3D & Art Tools", items: ["Blender", "Photoshop", "Substance Painter"] },
@@ -75,68 +82,363 @@ const DEFAULT_META = {
   ],
 };
 
-/* ============================================================
-   STYLE
-   ============================================================ */
 const GlobalStyle = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg: #0b0d12;
+      --bg-2: #11151d;
+      --surface: #121821;
+      --surface-strong: #161d2a;
+      --surface-soft: #1a2230;
+      --line: rgba(170, 180, 205, 0.16);
+      --line-strong: rgba(170, 180, 205, 0.24);
+      --text: #edf2f8;
+      --muted: #9ca7b8;
+      --accent: #a78bfa;
+      --accent-2: #8b5cf6;
+      --accent-soft: rgba(167, 139, 250, 0.14);
+      --ai-yes: #f7b267;
+      --ai-yes-soft: rgba(247, 178, 103, 0.12);
+      --ai-no: #70e0b8;
+      --ai-no-soft: rgba(112, 224, 184, 0.12);
+      --shadow: 0 18px 48px rgba(1, 4, 12, 0.52);
+      --panel: rgba(19, 25, 35, 0.86);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    a { color: inherit; }
+    button, input, select, textarea { font: inherit; }
     .pf-root {
-      --bg: #0B0D12; --surface: #12141B; --surface-2: #171A23; --line: #262B36;
-      --text: #EDEEF2; --muted: #8B909C; --accent: #7C5CFF;
-      --ai-yes: #FF9F43; --ai-yes-soft: rgba(255,159,67,0.12);
-      --ai-no: #38D9A9; --ai-no-soft: rgba(56,209,169,0.12);
-      background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
-      min-height: 100vh; width: 100%;
+      background: linear-gradient(180deg, #0b0d12 0%, #111722 100%);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      width: 100%;
     }
     .pf-root * { box-sizing: border-box; }
     .pf-mono { font-family: 'JetBrains Mono', monospace; }
     .pf-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-    .pf-scrollbar::-webkit-scrollbar-thumb { background: var(--line); }
+    .pf-scrollbar::-webkit-scrollbar-thumb { background: rgba(170,180,205,0.2); border-radius: 999px; }
     .pf-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .pf-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border: 1px solid; }
-    .pf-badge.yes { color: var(--ai-yes); background: var(--ai-yes-soft); border-color: rgba(255,159,67,0.35); }
-    .pf-badge.no { color: var(--ai-no); background: var(--ai-no-soft); border-color: rgba(56,209,169,0.35); }
-    .pf-card { background: var(--surface); border: 1px solid var(--line); transition: border-color .15s ease, transform .15s ease; cursor: pointer; }
-    .pf-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .pf-nav-tab { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); padding: 8px 12px; border: 1px solid transparent; cursor: pointer; white-space: nowrap; background: none; display: inline-flex; align-items: center; gap: 6px; }
-    .pf-nav-tab:hover { color: var(--text); }
-    .pf-nav-tab.active { color: var(--text); border-color: var(--line); background: var(--surface-2); }
-    .pf-btn { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em; padding: 10px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: border-color .15s ease, background .15s ease; }
-    .pf-btn:hover { border-color: var(--accent); }
-    .pf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .pf-btn.primary { background: var(--accent); border-color: var(--accent); color: #0B0D12; font-weight: 700; }
-    .pf-btn.primary:hover { opacity: 0.9; }
-    .pf-btn.danger:hover { border-color: #FF6A6A; color: #FF6A6A; }
-    .pf-input { width: 100%; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
-    .pf-input:focus { border-color: var(--accent); }
-    .pf-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
+
+    .pf-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 5px 9px; border-radius: 999px; border: 1px solid;
+      white-space: nowrap;
+    }
+    .pf-badge.yes { color: var(--ai-yes); background: var(--ai-yes-soft); border-color: rgba(247,178,103,0.35); }
+    .pf-badge.no { color: var(--ai-no); background: var(--ai-no-soft); border-color: rgba(112,224,184,0.34); }
+
+    .pf-card {
+      background: rgba(18, 24, 33, 0.86);
+      border: 1px solid var(--line);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      border-radius: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .pf-card:hover {
+      border-color: rgba(167,139,250,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(10, 12, 18, 0.45);
+    }
+
+    .pf-nav-tab {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+      color: var(--muted); padding: 8px 12px; border: 1px solid transparent; cursor: pointer;
+      white-space: nowrap; background: transparent; display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; transition: all 0.18s ease;
+    }
+    .pf-nav-tab:hover { color: var(--text); border-color: var(--line); }
+    .pf-nav-tab.active {
+      color: var(--text); border-color: var(--line); background: rgba(255,255,255,0.02);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .pf-btn {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
+      padding: 10px 16px; border: 1px solid var(--line); background: rgba(255,255,255,0.01);
+      color: var(--text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+      border-radius: 999px; text-transform: uppercase;
+    }
+    .pf-btn:hover { border-color: rgba(167,139,250,0.5); transform: translateY(-1px); }
+    .pf-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .pf-btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-color: transparent; color: #0f1220; font-weight: 700;
+    }
+    .pf-btn.danger:hover { border-color: rgba(255,107,107,0.7); color: #ffb4b4; }
+    .pf-input {
+      width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--line);
+      color: var(--text); padding: 10px 12px; font-size: 14px; outline: none; border-radius: 12px;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .pf-input:focus { border-color: rgba(167,139,250,0.6); box-shadow: 0 0 0 3px rgba(167,139,250,0.12); }
+    .pf-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px;
+    }
     .pf-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 
-    /* ---------- transitions ---------- */
-    @keyframes pf-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pf-fade-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pf-modal-in { from { opacity: 0; transform: scale(0.96) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    @keyframes pf-modal-out { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.97) translateY(6px); } }
-    @keyframes pf-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pf-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
-
     .pf-page-transition { animation: pf-fade-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
-    .pf-card-in { animation: pf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .pf-card-in { animation: pf-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
     .pf-modal-backdrop { animation: pf-backdrop-in 0.2s ease both; }
     .pf-modal-backdrop.closing { animation: pf-backdrop-out 0.18s ease both; }
     .pf-modal-panel { animation: pf-modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
     .pf-modal-panel.closing { animation: pf-modal-out 0.18s ease both; }
 
+    @keyframes pf-fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pf-modal-in {
+      from { opacity: 0; transform: scale(0.97) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes pf-modal-out {
+      from { opacity: 1; transform: scale(1) translateY(0); }
+      to { opacity: 0; transform: scale(0.97) translateY(8px); }
+    }
+    @keyframes pf-backdrop-in { from { opacity:0; } to { opacity:1; } }
+    @keyframes pf-backdrop-out { from { opacity:1; } to { opacity:0; } }
+
     @media (prefers-reduced-motion: reduce) {
       .pf-page-transition, .pf-card-in, .pf-modal-backdrop, .pf-modal-panel { animation: none !important; }
+    }
+
+    .pf-hero {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; align-items: center;
+      padding: 36px 0 20px; border-bottom: 1px solid var(--line); margin-bottom: 36px;
+    }
+    .pf-hero-copy { max-width: 620px; }
+    .pf-kicker { color: var(--accent); font-size: 12px; letter-spacing: 0.12em; margin-bottom: 18px; }
+    .pf-hero h1 {
+      font-size: clamp(38px, 5vw, 72px); line-height: 0.95; margin: 0; letter-spacing: -0.06em; font-weight: 700;
+    }
+    .pf-tagline {
+      margin: 22px 0 10px; color: var(--muted); font-size: clamp(17px, 2vw, 22px); line-height: 1.6;
+      max-width: 560px;
+    }
+    .pf-lead {
+      margin: 0; color: rgba(237,242,248,0.78); line-height: 1.8; font-size: 16px; max-width: 560px;
+    }
+    .pf-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+    .pf-status-row {
+      margin-top: 22px; display: inline-flex; align-items: center; gap: 10px;
+      color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px;
+      background: rgba(255,255,255,0.01);
+    }
+    .pf-status-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, #7cfdc8, #9cdbff);
+      box-shadow: 0 0 18px rgba(125, 253, 200, 0.75);
+      display: inline-block;
+    }
+
+    .pf-profile-frame {
+      position: relative; width: 100%; border-radius: 28px; background: linear-gradient(180deg, rgba(167,139,250,0.12), rgba(12,14,20,0.15));
+      border: 1px solid rgba(167,139,250,0.22); overflow: hidden; box-shadow: var(--shadow);
+      min-height: 320px;
+    }
+    .pf-profile-frame img {
+      width: 100%; height: 100%; display: block; object-fit: cover; object-position: center;
+      background: rgba(255,255,255,0.02);
+    }
+    .pf-profile-frame.pf-profile-style-portrait { border-radius: 26px; }
+    .pf-profile-frame.pf-profile-style-square { border-radius: 22px; }
+    .pf-profile-frame.pf-profile-style-circle { border-radius: 50%; aspect-ratio: 1/1 !important; }
+    .pf-profile-frame.pf-profile-style-rounded_rectangle { border-radius: 30px; }
+    .pf-profile-frame.pf-profile-style-landscape { border-radius: 22px; }
+    .pf-profile-placeholder {
+      display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+      background: radial-gradient(circle at top, rgba(167,139,250,0.18), rgba(11,13,18,0.96));
+      color: var(--text); font-size: clamp(22px, 4vw, 38px); font-family: 'JetBrains Mono', monospace; font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .pf-home-section { margin-top: 28px; }
+    .pf-section-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;
+    }
+    .pf-section-label {
+      font-size: 11px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase;
+    }
+    .pf-feature-grid, .pf-project-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;
+    }
+    .pf-project-card {
+      width: 100%; border-radius: 18px; overflow: hidden; text-align: left;
+      background: rgba(18, 24, 33, 0.86); border: 1px solid var(--line); cursor: pointer; padding: 0;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+    .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.5); }
+    .pf-project-visual {
+      position: relative; width: 100%; height: 260px; overflow: hidden; background: #111827;
+      border-bottom: 1px solid var(--line);
+    }
+    .pf-project-visual img {
+      width: 100%; height: 100%; display: block; object-fit: cover; transition: transform 0.35s ease;
+    }
+    .pf-project-card:hover .pf-project-visual img { transform: scale(1.04); }
+    .pf-project-overlay {
+      position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,8,12,0.12), rgba(7,8,12,0.52));
+      display: flex; align-items: flex-end; justify-content: space-between; padding: 14px;
+    }
+    .pf-project-category {
+      color: var(--text); background: rgba(11,13,18,0.48); border: 1px solid rgba(255,255,255,0.08);
+      padding: 5px 8px; border-radius: 999px; font-size: 9px; letter-spacing: 0.08em;
+    }
+    .pf-project-body {
+      padding: 16px 16px 18px;
+    }
+    .pf-project-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
+    }
+    .pf-project-head h3 {
+      margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -0.03em;
+    }
+    .pf-project-body p {
+      margin: 0; color: rgba(237,242,248,0.74); font-size: 14px; line-height: 1.65;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pf-tool-row {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+    }
+    .pf-tag {
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px; color: var(--muted);
+      background: rgba(255,255,255,0.02); font-size: 10px; letter-spacing: 0.06em;
+    }
+
+    .pf-capability-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
+    }
+    .pf-capability-card {
+      text-align: left; border: 1px solid var(--line); background: rgba(18,24,33,0.82); border-radius: 18px;
+      padding: 18px; color: var(--text); cursor: pointer; transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+    .pf-capability-card:hover { border-color: rgba(167,139,250,0.5); transform: translateY(-2px); }
+    .pf-capability-topline {
+      display: flex; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 12px;
+    }
+    .pf-capability-card strong {
+      display: block; font-size: 20px; margin-bottom: 8px; letter-spacing: -0.04em;
+    }
+    .pf-capability-card span:last-child {
+      color: var(--muted); font-size: 13px;
+    }
+
+    .pf-skill-section { margin-bottom: 18px; }
+    .pf-skill-tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .pf-skill-card {
+      border: 1px solid var(--line); background: rgba(18,24,33,0.82); border-radius: 18px;
+      padding: 18px; margin-bottom: 18px;
+    }
+
+    .pf-about-preview { margin-top: 30px; }
+    .pf-about-panel {
+      border: 1px solid var(--line); background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(18,24,33,0.82));
+      border-radius: 22px; padding: 26px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .pf-about-panel h3 { margin: 10px 0 10px; font-size: clamp(24px, 2vw, 38px); letter-spacing: -0.04em; }
+    .pf-about-panel p { margin: 0; color: rgba(237,242,248,0.74); line-height: 1.7; max-width: 640px; }
+
+    .pf-about-layout {
+      display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 28px; align-items: center;
+    }
+    .pf-about-image-wrap { width: 100%; }
+    .pf-about-copy h2 { margin: 12px 0 10px; font-size: clamp(28px, 4vw, 52px); letter-spacing: -0.06em; }
+    .pf-role-line { color: var(--muted); margin: 0 0 18px; font-size: 18px; }
+    .pf-about-copy p { margin: 0; color: rgba(237,242,248,0.78); line-height: 1.8; font-size: 16px; }
+
+    .pf-page-header {
+      display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;
+    }
+    .pf-page-header-label {
+      display: inline-flex; align-items: center; gap: 8px; color: var(--muted);
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .pf-page-header h2 { margin: 0; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.06em; }
+    .pf-filter-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px;
+    }
+    .pf-empty {
+      color: var(--muted); border: 1px solid var(--line); background: rgba(255,255,255,0.01);
+      border-radius: 14px; padding: 18px 20px; width: 100%;
+    }
+
+    .pf-footer {
+      margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      color: var(--muted);
+    }
+    .pf-footer-links { display: flex; align-items: center; gap: 14px; }
+    .pf-footer-links a {
+      display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center;
+      border-radius: 50%; border: 1px solid var(--line); background: rgba(255,255,255,0.01);
+      color: var(--muted); transition: border-color 0.18s ease, color 0.18s ease;
+    }
+    .pf-footer-links a:hover { border-color: rgba(167,139,250,0.5); color: var(--text); }
+
+    .pf-modal-meta {
+      display: flex; flex-direction: column; gap: 14px; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line);
+    }
+    .pf-modal-meta p {
+      margin: 0; color: var(--muted); display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+    .pf-modal-meta strong { color: var(--text); }
+    .pf-meta-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .pf-contact-item { transition: border-color 0.18s ease, transform 0.18s ease; }
+    .pf-contact-item:hover { border-color: rgba(167,139,250,0.5); }
+
+    .pf-profile-manager {
+      border: 1px solid var(--line); background: rgba(18,24,33,0.82); padding: 20px; border-radius: 18px;
+    }
+    .pf-profile-manager-preview {
+      display: flex; justify-content: center; margin-bottom: 18px;
+    }
+    .pf-profile-manager-actions {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px;
+    }
+    .pf-profile-settings-grid {
+      display: grid; gap: 16px;
+    }
+    .pf-option-list {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .pf-option-list.compact { gap: 6px; }
+    .pf-option-pill {
+      border: 1px solid var(--line); background: rgba(255,255,255,0.02); border-radius: 999px;
+      color: var(--muted); padding: 7px 10px; cursor: pointer; transition: all 0.18s ease;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .pf-option-pill.selected {
+      border-color: rgba(167,139,250,0.5); color: var(--text); background: rgba(167,139,250,0.08);
+    }
+
+    @media (max-width: 900px) {
+      .pf-hero, .pf-about-layout { grid-template-columns: 1fr; }
+      .pf-hero { gap: 28px; padding-top: 20px; }
+      .pf-about-panel { flex-direction: column; align-items: flex-start; }
+      .pf-profile-frame { max-width: 460px; margin: 0 auto; }
+    }
+
+    @media (max-width: 640px) {
+      .pf-hero-copy h1 { font-size: 42px; }
+      .pf-project-visual { height: 220px; }
+      .pf-project-body h3 { font-size: 16px; }
+      .pf-about-panel { padding: 18px; }
+      .pf-profile-manager { padding: 16px; }
+      .pf-btn, .pf-nav-tab { padding-left: 12px; padding-right: 12px; }
     }
   `}</style>
 );
 
-/* ============================================================
-   SUPABASE HELPERS (plain REST calls — no SDK needed)
-   ============================================================ */
 const REST = `${SUPABASE_URL}/rest/v1`;
 const AUTH = `${SUPABASE_URL}/auth/v1`;
 const STORAGE = `${SUPABASE_URL}/storage/v1`;
@@ -207,8 +509,6 @@ async function sbUploadFile(file, token, folder = "uploads") {
   if (!res.ok) throw new Error(await res.text());
   return `${SUPABASE_URL}/storage/v1/object/public/project-images/${path}`;
 }
-// Deletes the actual file in storage given its public URL. Best-effort —
-// failures here shouldn't block removing the reference from the project.
 async function sbDeleteFile(publicUrl, token) {
   if (!publicUrl) return;
   const marker = "/object/public/project-images/";
@@ -221,7 +521,7 @@ async function sbDeleteFile(publicUrl, token) {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
     });
   } catch {
-    // ignore — file may already be gone, or network hiccup; not worth blocking the user over
+    // ignore
   }
 }
 
@@ -247,15 +547,13 @@ function compressImage(file, maxDimension = 1200, quality = 0.78) {
   });
 }
 
-/* ============================================================
-   SHARED UI
-   ============================================================ */
 const AiBadge = ({ used }) => (
   <span className={`pf-badge ${used ? "yes" : "no"}`}>
     <span className="pf-dot" style={{ background: used ? "#FF9F43" : "#38D9A9" }} />
     {used ? "AI: ASSISTED" : "AI: NONE"}
   </span>
 );
+
 const CategoryIcon = ({ id, size = 14 }) => {
   const cat = CATEGORIES.find((c) => c.id === id);
   const Icon = cat ? cat.icon : Sparkles;
@@ -264,35 +562,43 @@ const CategoryIcon = ({ id, size = 14 }) => {
 
 function ProjectCard({ project, onOpen, index = 0 }) {
   const thumb = thumbnailOf(project);
+  const cat = CATEGORIES.find((c) => c.id === project.category);
+  const displayTools = (project.tools || []).slice(0, 3);
+
   return (
-    <div
-      className="pf-card pf-card-in"
-      style={{ minWidth: 240, maxWidth: 240, animationDelay: `${Math.min(index, 8) * 40}ms` }}
-      onClick={() => onOpen(project)}
-    >
-      <div style={{ height: 150, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-        {thumb ? <img src={thumb} alt={project.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={project.category} size={28} />}
+    <button type="button" className="pf-project-card pf-card-in" style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }} onClick={() => onOpen(project)}>
+      <div className="pf-project-visual">
+        {thumb ? <img src={thumb} alt={project.title} /> : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: "var(--muted)" }}><CategoryIcon id={project.category} size={28} /></div>}
+        <div className="pf-project-overlay">
+          <span className="pf-mono pf-project-category">{cat ? cat.short : "PROJECT"}</span>
+          <AiBadge used={project.ai_used} />
+        </div>
       </div>
-      <div style={{ padding: 12 }}>
-        <div className="pf-mono" style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{project.title}</div>
-        <AiBadge used={project.ai_used} />
+      <div className="pf-project-body">
+        <div className="pf-project-head">
+          <h3>{project.title}</h3>
+          <ArrowRight size={15} color="var(--muted)" />
+        </div>
+        <p>{project.description}</p>
+        {displayTools.length > 0 && (
+          <div className="pf-tool-row">
+            {displayTools.map((tool, idx) => <span key={idx} className="pf-mono pf-tag">{tool}</span>)}
+          </div>
+        )}
       </div>
-    </div>
+    </button>
   );
 }
 
-/* ============================================================
-   NAV
-   ============================================================ */
 function Nav({ route, setRoute, meta }) {
   const tabs = [...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "skills", label: "SKILLS" }, { id: "about", label: "ABOUT" }, { id: "contact", label: "CONTACT" }];
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(11,13,18,0.92)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+    <div style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(11,13,18,0.82)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, flexWrap: "wrap" }}>
         <div className="pf-mono" style={{ fontWeight: 800, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onClick={() => setRoute({ page: "home" })}>
           <Terminal size={16} color="var(--accent)" /> {meta.name}
         </div>
-        <div className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto" }}>
+        <div className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto", flex: 1, justifyContent: "center" }}>
           {tabs.map((t) => <button key={t.id} className={`pf-nav-tab ${route.page === t.id ? "active" : ""}`} onClick={() => setRoute({ page: t.id })}>{t.label}</button>)}
         </div>
         <button className="pf-nav-tab" onClick={() => setRoute({ page: "admin" })}><Lock size={12} /> ADMIN</button>
@@ -301,48 +607,113 @@ function Nav({ route, setRoute, meta }) {
   );
 }
 
-/* ============================================================
-   HOME / CATEGORY / MODAL / SKILLS / ABOUT / CONTACT
-   ============================================================ */
+function getProfileImageConfig(meta = {}) {
+  const links = meta.links || {};
+  return {
+    url: meta.profile_image_url || links.profile_image_url || "",
+    style: meta.profile_image_style || links.profile_image_style || "rounded_rectangle",
+    aspect: meta.profile_image_aspect_ratio || links.profile_image_aspect_ratio || "4:5",
+    position: meta.profile_image_position || links.profile_image_position || "center",
+  };
+}
+
+function getObjectPosition(position) {
+  const map = {
+    center: "50% 50%",
+    top: "50% 12%",
+    bottom: "50% 88%",
+    left: "12% 50%",
+    right: "88% 50%",
+  };
+  return map[position] || map.center;
+}
+
 function Home({ meta, projects, setRoute, openProject }) {
-  const featured = projects.slice(0, 6);
+  const featured = projects.slice(0, 4);
+  const firstCategory = CATEGORIES[0]?.id || "games";
+  const skillsPreview = meta.skills.flatMap((g) => g.items).slice(0, 14);
+  const profile = getProfileImageConfig(meta);
+
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "60px 20px 40px" }}>
-      <div className="pf-mono" style={{ fontSize: 12, color: "var(--accent)", marginBottom: 14 }}>$ whoami --role="{meta.role}"</div>
-      <h1 className="pf-mono" style={{ fontSize: "clamp(32px,6vw,56px)", fontWeight: 800, lineHeight: 1.1, margin: 0, maxWidth: 760 }}>{meta.name}</h1>
-      <p style={{ color: "var(--muted)", fontSize: 16, maxWidth: 560, marginTop: 16, lineHeight: 1.6 }}>{meta.tagline}</p>
-      <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
-        {CATEGORIES.map((c) => <button key={c.id} className="pf-btn" onClick={() => setRoute({ page: c.id })}><c.icon size={14} /> {c.label}</button>)}
-      </div>
-      <div style={{ marginTop: 56 }}>
-        <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted)", marginBottom: 14 }}>// FEATURED</div>
-        <div className="pf-scrollbar" style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8 }}>
-          {featured.length === 0 && <div style={{ color: "var(--muted)" }}>No projects yet — add some from the admin panel.</div>}
+    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "56px 20px 40px" }}>
+      <section className="pf-hero">
+        <div className="pf-hero-copy">
+          <div className="pf-mono pf-kicker">$ whoami --role="{meta.role}"</div>
+          <h1>{meta.name}</h1>
+          <p className="pf-tagline">{meta.tagline}</p>
+          <p className="pf-lead">{meta.bio}</p>
+          <div className="pf-actions">
+            <button type="button" className="pf-btn primary" onClick={() => setRoute({ page: firstCategory })}><span>View Work</span> <ArrowRight size={14} /></button>
+            <button type="button" className="pf-btn" onClick={() => setRoute({ page: "contact" })}>Contact</button>
+          </div>
+          <div className="pf-status-row">
+            <span className="pf-status-dot" />
+            <span className="pf-mono">Available for selected collaborations</span>
+          </div>
+        </div>
+        <div className="pf-hero-media">
+          <div className={`pf-profile-frame pf-profile-style-${profile.style}`} style={{ aspectRatio: profile.aspect }}>
+            {profile.url ? (
+              <img src={profile.url} alt={`${meta.name} profile`} style={{ objectPosition: getObjectPosition(profile.position) }} />
+            ) : (
+              <div className="pf-profile-placeholder">
+                <span>{meta.name ? meta.name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase() : "NN"}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="pf-home-section">
+        <div className="pf-section-header">
+          <div className="pf-mono pf-section-label">// Selected Work</div>
+          <button type="button" className="pf-nav-tab" onClick={() => setRoute({ page: firstCategory })}>View all <ArrowRight size={12} /></button>
+        </div>
+        <div className="pf-feature-grid">
+          {featured.length === 0 && <div className="pf-empty">No projects yet — add some from the admin panel.</div>}
           {featured.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
         </div>
-      </div>
-      {CATEGORIES.map((c) => {
-        const items = projects.filter((p) => p.category === c.id).slice(0, 3);
-        if (items.length === 0) return null;
-        return (
-          <div key={c.id} style={{ marginTop: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted)", display: "flex", alignItems: "center", gap: 8 }}><c.icon size={13} /> {c.short}</div>
-              <button className="pf-nav-tab" onClick={() => setRoute({ page: c.id })}>VIEW ALL <ArrowRight size={12} /></button>
-            </div>
-            <div className="pf-scrollbar" style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8 }}>
-              {items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
-            </div>
-          </div>
-        );
-      })}
-      <div style={{ marginTop: 56 }}>
-        <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted)", marginBottom: 14 }}>// SKILLS</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {meta.skills.flatMap((g) => g.items).slice(0, 14).map((s, i) => <span key={i} className="pf-mono" style={{ fontSize: 11, border: "1px solid var(--line)", padding: "6px 10px", color: "var(--muted)" }}>{s}</span>)}
+      </section>
+
+      <section className="pf-home-section">
+        <div className="pf-section-header">
+          <div className="pf-mono pf-section-label">// Capabilities</div>
         </div>
-        <button className="pf-nav-tab" style={{ marginTop: 14, paddingLeft: 0 }} onClick={() => setRoute({ page: "skills" })}>VIEW ALL SKILLS <ArrowRight size={12} /></button>
-      </div>
+        <div className="pf-capability-grid">
+          {CATEGORIES.map((c) => {
+            const count = projects.filter((p) => p.category === c.id).length;
+            return (
+              <button type="button" key={c.id} className="pf-capability-card" onClick={() => setRoute({ page: c.id })}>
+                <div className="pf-capability-topline"><c.icon size={14} /><span className="pf-mono">{c.short}</span></div>
+                <strong>{c.label}</strong>
+                <span>{count} project{count === 1 ? "" : "s"}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="pf-home-section pf-skill-section">
+        <div className="pf-section-header">
+          <div className="pf-mono pf-section-label">// Skills</div>
+          <button type="button" className="pf-nav-tab" onClick={() => setRoute({ page: "skills" })}>View all <ArrowRight size={12} /></button>
+        </div>
+        <div className="pf-skill-tags">
+          {skillsPreview.map((s, i) => <span key={i} className="pf-mono pf-tag">{s}</span>)}
+        </div>
+      </section>
+
+      <section className="pf-home-section pf-about-preview">
+        <div className="pf-about-panel">
+          <div>
+            <div className="pf-mono pf-section-label">// About</div>
+            <h3>{meta.name}</h3>
+            <p>{meta.bio}</p>
+          </div>
+          <button type="button" className="pf-btn" onClick={() => setRoute({ page: "about" })}>More about me</button>
+        </div>
+      </section>
+
       <Footer meta={meta} />
     </div>
   );
@@ -350,15 +721,15 @@ function Home({ meta, projects, setRoute, openProject }) {
 
 function Footer({ meta }) {
   return (
-    <div style={{ marginTop: 72, borderTop: "1px solid var(--line)", paddingTop: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-      <div className="pf-mono" style={{ fontSize: 11, color: "var(--muted)" }}>© {new Date().getFullYear()} {meta.name}</div>
-      <div style={{ display: "flex", gap: 14 }}>
-        {meta.email && <a href={`mailto:${meta.email}`} style={{ color: "var(--muted)" }}><Mail size={16} /></a>}
-        {meta.links.github && <a href={meta.links.github} target="_blank" rel="noreferrer" style={{ color: "var(--muted)" }}><Github size={16} /></a>}
-        {meta.links.linkedin && <a href={meta.links.linkedin} target="_blank" rel="noreferrer" style={{ color: "var(--muted)" }}><Linkedin size={16} /></a>}
-        {meta.links.other && <a href={meta.links.other} target="_blank" rel="noreferrer" style={{ color: "var(--muted)" }}><Globe size={16} /></a>}
+    <footer className="pf-footer">
+      <div className="pf-mono">© {new Date().getFullYear()} {meta.name}</div>
+      <div className="pf-footer-links">
+        {meta.email && <a href={`mailto:${meta.email}`} aria-label="Email"><Mail size={16} /></a>}
+        {meta.links.github && <a href={meta.links.github} target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={16} /></a>}
+        {meta.links.linkedin && <a href={meta.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={16} /></a>}
+        {meta.links.other && <a href={meta.links.other} target="_blank" rel="noreferrer" aria-label="Website"><Globe size={16} /></a>}
       </div>
-    </div>
+    </footer>
   );
 }
 
@@ -369,17 +740,21 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
   if (filter === "ai") items = items.filter((p) => p.ai_used);
   if (filter === "manual") items = items.filter((p) => !p.ai_used);
   items = [...items].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 20px" }}>
-      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> BACK</button>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}><cat.icon size={22} /><h2 className="pf-mono" style={{ fontSize: 26, margin: 0 }}>{cat.label}</h2></div>
-      <div style={{ display: "flex", gap: 8, margin: "18px 0 28px" }}>
-        {[["all", "All"], ["ai", "AI-assisted"], ["manual", "No AI"]].map(([id, label]) => <button key={id} className={`pf-nav-tab ${filter === id ? "active" : ""}`} onClick={() => setFilter(id)}>{label}</button>)}
+    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 20px 60px" }}>
+      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 18 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
+      <div className="pf-page-header">
+        <div className="pf-page-header-label"><cat.icon size={18} /> <span className="pf-mono">{cat.short}</span></div>
+        <h2>{cat.label}</h2>
       </div>
-      {items.length === 0 ? <div style={{ color: "var(--muted)" }}>No projects in this category yet.</div> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 16 }}>
-          {items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}
-        </div>
+      <div className="pf-filter-row">
+        {[["all", "All"], ["ai", "AI-assisted"], ["manual", "No AI"]].map(([id, label]) => (
+          <button key={id} type="button" className={`pf-nav-tab ${filter === id ? "active" : ""}`} onClick={() => setFilter(id)}>{label}</button>
+        ))}
+      </div>
+      {items.length === 0 ? <div className="pf-empty">No projects in this category yet.</div> : (
+        <div className="pf-project-grid">{items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}</div>
       )}
       <Footer meta={meta} />
     </div>
@@ -394,8 +769,6 @@ function ProjectModal({ project, onClose }) {
     if (project) { setShown(project); setClosing(false); }
   }, [project]);
 
-  // Lock page scroll while the modal is open, so the background page
-  // doesn't scroll along with it — restore on close/unmount.
   useEffect(() => {
     if (!project) return;
     const prevOverflow = document.body.style.overflow;
@@ -414,31 +787,37 @@ function ProjectModal({ project, onClose }) {
   const groups = IMAGE_GROUPS[p.category] || [];
   const imgs = p.images || [];
   const hero = thumbnailOf(p);
+
   return (
-    <div className={`pf-modal-backdrop ${closing ? "closing" : ""}`} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={handleClose}>
-      <div className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 920, width: "100%", maxHeight: "92vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.95)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
-          <button className="pf-btn" onClick={handleClose}><X size={14} /></button>
+    <div className={`pf-modal-backdrop ${closing ? "closing" : ""}`} style={{ position: "fixed", inset: 0, background: "rgba(2,4,8,0.82)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={handleClose}>
+      <div role="dialog" aria-modal="true" className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 960, width: "100%", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 26px 80px rgba(0,0,0,0.42)" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.96)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
+          <button className="pf-btn" onClick={handleClose} aria-label="Close project details"><X size={14} /></button>
         </div>
 
         {hero && (
-          <div style={{ maxHeight: "50vh", minHeight: 200, background: "var(--surface-2)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "50vh", objectFit: "contain" }} />
+          <div style={{ background: "linear-gradient(180deg, rgba(124,92,255,0.06), rgba(0,0,0,0))", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <img src={hero} alt={p.title} style={{ width: "100%", maxHeight: "52vh", objectFit: "cover", display: "block" }} />
           </div>
         )}
 
         <div style={{ padding: 28 }}>
-          <h3 className="pf-mono" style={{ fontSize: 24, margin: 0 }}>{p.title}</h3>
-          <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
+          <div className="pf-mono pf-section-label">{CATEGORIES.find((c) => c.id === p.category)?.short || "PROJECT"}</div>
+          <h3 style={{ margin: "8px 0 0", fontSize: "clamp(29px, 3vw, 42px)", lineHeight: 1.1 }}>{p.title}</h3>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "14px 0" }}>
             <AiBadge used={p.ai_used} />
-            {p.date && <span className="pf-mono" style={{ fontSize: 11, color: "var(--muted)", border: "1px solid var(--line)", padding: "4px 8px" }}>{p.date}</span>}
+            {p.date && <span className="pf-mono" style={{ fontSize: 11, color: "var(--muted)", border: "1px solid var(--line)", padding: "4px 8px", borderRadius: 999 }}>{p.date}</span>}
           </div>
-          {p.ai_used && p.ai_note && <p style={{ fontSize: 13, color: "var(--ai-yes)", background: "var(--ai-yes-soft)", padding: "8px 10px", border: "1px solid rgba(255,159,67,0.3)" }}>{p.ai_note}</p>}
-          <p style={{ color: "var(--text)", lineHeight: 1.6, fontSize: 14, marginTop: 14, whiteSpace: "pre-wrap" }}>{p.description}</p>
-          {p.role && <p style={{ color: "var(--muted)", fontSize: 13 }}><strong style={{ color: "var(--text)" }}>Role:</strong> {p.role}</p>}
-          {p.tools?.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-              {p.tools.map((t, i) => <span key={i} className="pf-mono" style={{ fontSize: 10, border: "1px solid var(--line)", padding: "4px 8px", color: "var(--muted)" }}>{t}</span>)}
+          {p.ai_used && p.ai_note && <p style={{ fontSize: 13, color: "var(--ai-yes)", background: "var(--ai-yes-soft)", padding: "8px 10px", border: "1px solid rgba(255,159,67,0.3)", borderRadius: 10 }}>{p.ai_note}</p>}
+          <p style={{ color: "var(--text)", lineHeight: 1.7, fontSize: 15, marginTop: 16, whiteSpace: "pre-wrap" }}>{p.description}</p>
+          {(p.role || p.tools?.length) && (
+            <div className="pf-modal-meta">
+              {p.role && <p><strong>Role</strong> <span>{p.role}</span></p>}
+              {p.tools?.length > 0 && (
+                <div className="pf-meta-tools">
+                  {p.tools.map((t, i) => <span key={i} className="pf-mono pf-tag">{t}</span>)}
+                </div>
+              )}
             </div>
           )}
           {p.link && <a href={p.link} target="_blank" rel="noreferrer" className="pf-btn primary" style={{ marginTop: 20, textDecoration: "none" }}>View project <ExternalLink size={13} /></a>}
@@ -449,11 +828,11 @@ function ProjectModal({ project, onClose }) {
             if (items.length === 0) return null;
             return (
               <div key={g.key} style={{ marginTop: 28 }}>
-                <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 10 }}>{g.label.toUpperCase()}</div>
+                <div className="pf-mono pf-section-label" style={{ marginBottom: 10 }}>{g.label.toUpperCase()}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 10 }}>
                   {items.map((img, i) => (
-                    <a key={i} href={img.url} target="_blank" rel="noreferrer" style={{ display: "block", border: "1px solid var(--line)", overflow: "hidden" }}>
-                      <img src={img.url} alt={`${g.label} ${i + 1}`} style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+                    <a key={i} href={img.url} target="_blank" rel="noreferrer" style={{ display: "block", border: "1px solid var(--line)", overflow: "hidden", background: "var(--surface-2)" }}>
+                      <img src={img.url} alt={`${g.label} ${i + 1}`} style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
                     </a>
                   ))}
                 </div>
@@ -463,7 +842,7 @@ function ProjectModal({ project, onClose }) {
 
           {p.pdf_url && (
             <div style={{ marginTop: 28 }}>
-              <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 10 }}>ATTACHMENT</div>
+              <div className="pf-mono pf-section-label" style={{ marginBottom: 10 }}>Attachment</div>
               <a href={p.pdf_url} target="_blank" rel="noreferrer" className="pf-btn" style={{ textDecoration: "none" }}>
                 <ExternalLink size={13} /> Open PDF
               </a>
@@ -477,27 +856,48 @@ function ProjectModal({ project, onClose }) {
 
 function SkillsPage({ meta, setRoute }) {
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 20px" }}>
-      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> BACK</button>
-      <h2 className="pf-mono" style={{ fontSize: 26, marginBottom: 28 }}>Skills</h2>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 20px 60px" }}>
+      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
+      <div className="pf-page-header" style={{ marginBottom: 24 }}>
+        <div className="pf-page-header-label"><Terminal size={16} /> <span className="pf-mono">Skills</span></div>
+        <h2>Capabilities</h2>
+      </div>
       {meta.skills.map((g, i) => (
-        <div key={i} style={{ marginBottom: 26 }}>
-          <div className="pf-mono" style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--accent)", marginBottom: 10 }}>{g.group.toUpperCase()}</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{g.items.map((s, j) => <span key={j} className="pf-mono" style={{ fontSize: 12, border: "1px solid var(--line)", padding: "7px 12px" }}>{s}</span>)}</div>
-        </div>
+        <section key={i} className="pf-skill-card">
+          <div className="pf-mono pf-section-label" style={{ marginBottom: 12 }}>{g.group.toUpperCase()}</div>
+          <div className="pf-skill-tags">{g.items.map((s, j) => <span key={j} className="pf-mono pf-tag">{s}</span>)}</div>
+        </section>
       ))}
     </div>
   );
 }
+
 function AboutPage({ meta, setRoute }) {
+  const profile = getProfileImageConfig(meta);
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 20px" }}>
-      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> BACK</button>
-      <h2 className="pf-mono" style={{ fontSize: 26, marginBottom: 20 }}>About</h2>
-      <p style={{ lineHeight: 1.8, fontSize: 15, whiteSpace: "pre-wrap" }}>{meta.bio}</p>
+    <div style={{ maxWidth: 1020, margin: "0 auto", padding: "40px 20px 60px" }}>
+      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
+      <div className="pf-about-layout">
+        <div className="pf-about-image-wrap">
+          <div className={`pf-profile-frame pf-profile-style-${profile.style}`} style={{ aspectRatio: profile.aspect }}>
+            {profile.url ? (
+              <img src={profile.url} alt={`${meta.name} portrait`} style={{ objectPosition: getObjectPosition(profile.position) }} />
+            ) : (
+              <div className="pf-profile-placeholder"><span>{meta.name ? meta.name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase() : "NN"}</span></div>
+            )}
+          </div>
+        </div>
+        <div className="pf-about-copy">
+          <div className="pf-mono pf-section-label">// About</div>
+          <h2>{meta.name}</h2>
+          <p className="pf-role-line">{meta.role}</p>
+          <p>{meta.bio}</p>
+        </div>
+      </div>
     </div>
   );
 }
+
 function ContactPage({ meta, setRoute }) {
   const rows = [
     { icon: Mail, label: "Email", value: meta.email, href: meta.email ? `mailto:${meta.email}` : null },
@@ -508,15 +908,21 @@ function ContactPage({ meta, setRoute }) {
     { icon: Globe, label: "Other", value: meta.links.other, href: meta.links.other || null },
   ].filter((r) => r.value);
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 20px" }}>
-      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> BACK</button>
-      <h2 className="pf-mono" style={{ fontSize: 26, marginBottom: 20 }}>Contact</h2>
-      {rows.length === 0 && <div style={{ color: "var(--muted)" }}>Add your contact links from the admin panel.</div>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 60px" }}>
+      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
+      <div className="pf-page-header" style={{ marginBottom: 24 }}>
+        <div className="pf-page-header-label"><Mail size={16} /> <span className="pf-mono">Contact</span></div>
+        <h2>Let’s build something thoughtful.</h2>
+      </div>
+      {rows.length === 0 && <div className="pf-empty">Add your contact links from the admin panel.</div>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {rows.map((r, i) => (
-          <a key={i} href={r.href} target="_blank" rel="noreferrer" className="pf-card" style={{ display: "flex", alignItems: "center", gap: 12, padding: 14, textDecoration: "none", color: "var(--text)" }}>
-            <r.icon size={16} color="var(--accent)" />
-            <div><div className="pf-mono" style={{ fontSize: 10, color: "var(--muted)" }}>{r.label.toUpperCase()}</div><div style={{ fontSize: 14 }}>{r.value}</div></div>
+          <a key={i} href={r.href} target="_blank" rel="noreferrer" className="pf-card pf-contact-item" style={{ display: "flex", alignItems: "center", gap: 14, padding: 18, textDecoration: "none", color: "var(--text)" }}>
+            <r.icon size={18} color="var(--accent)" />
+            <div>
+              <div className="pf-mono" style={{ fontSize: 10, color: "var(--muted)" }}>{r.label.toUpperCase()}</div>
+              <div style={{ fontSize: 15 }}>{r.value}</div>
+            </div>
           </a>
         ))}
       </div>
@@ -524,9 +930,6 @@ function ContactPage({ meta, setRoute }) {
   );
 }
 
-/* ============================================================
-   ADMIN
-   ============================================================ */
 const EMPTY_PROJECT = { title: "", category: "games", description: "", ai_used: false, ai_note: "", tools: [], role: "", date: "", link: "", images: [], pdf_url: "" };
 
 function AdminLogin({ onLogin }) {
@@ -576,14 +979,14 @@ function AdminLogin({ onLogin }) {
   );
 }
 
-function ImageGroupField({ group, images, onAdd, onRemove, uploadingKey, onUpload }) {
+function ImageGroupField({ group, images, onRemove, uploadingKey, onUpload }) {
   const items = images.filter((i) => i.group === group.key);
   const fileRef = useRef();
   const isUploading = uploadingKey === group.key;
 
   const handleFile = async (e) => {
     const file = e.target.files[0];
-    e.target.value = ""; // allow re-selecting the same file later
+    e.target.value = "";
     if (!file) return;
     await onUpload(file, group.key, group.single);
   };
@@ -596,6 +999,7 @@ function ImageGroupField({ group, images, onAdd, onRemove, uploadingKey, onUploa
           <div key={i} style={{ position: "relative" }}>
             <img src={img.url} alt="" style={{ width: 72, height: 72, objectFit: "cover", border: "1px solid var(--line)" }} />
             <button
+              type="button"
               onClick={() => onRemove(group.key, i)}
               style={{ position: "absolute", top: -6, right: -6, background: "#FF6A6A", border: "none", borderRadius: "50%", width: 18, height: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
@@ -605,7 +1009,7 @@ function ImageGroupField({ group, images, onAdd, onRemove, uploadingKey, onUploa
         ))}
       </div>
       {(!group.single || items.length === 0) && (
-        <button className="pf-btn" onClick={() => fileRef.current.click()} disabled={isUploading}>
+        <button type="button" className="pf-btn" onClick={() => fileRef.current.click()} disabled={isUploading}>
           <Upload size={13} /> {isUploading ? "Uploading..." : `Upload ${group.single ? "image" : "image(s)"}`}
         </button>
       )}
@@ -635,7 +1039,6 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
         const others = single ? (f.images || []).filter((i) => i.group !== groupKey) : (f.images || []);
         return { ...f, images: [...others, { url, group: groupKey }] };
       });
-      // Clean up the file(s) being replaced so storage doesn't accumulate orphans
       for (const old of oldOnes) await sbDeleteFile(old.url, token);
     } catch (e2) {
       setErr("Image upload failed: " + e2.message);
@@ -703,8 +1106,8 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
       <div style={{ marginBottom: 14 }}>
         <label className="pf-label">Was AI used in this project?</label>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className={`pf-btn ${form.ai_used ? "primary" : ""}`} onClick={() => setForm({ ...form, ai_used: true })}>Yes</button>
-          <button className={`pf-btn ${!form.ai_used ? "primary" : ""}`} onClick={() => setForm({ ...form, ai_used: false, ai_note: "" })}>No</button>
+          <button type="button" className={`pf-btn ${form.ai_used ? "primary" : ""}`} onClick={() => setForm({ ...form, ai_used: true })}>Yes</button>
+          <button type="button" className={`pf-btn ${!form.ai_used ? "primary" : ""}`} onClick={() => setForm({ ...form, ai_used: false, ai_note: "" })}>No</button>
         </div>
       </div>
       {form.ai_used && (
@@ -720,7 +1123,6 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
             key={g.key}
             group={g}
             images={form.images || []}
-            onAdd={() => {}}
             onRemove={removeImage}
             uploadingKey={uploadingKey}
             onUpload={uploadToGroup}
@@ -735,10 +1137,10 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
           {form.pdf_url ? (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <a href={form.pdf_url} target="_blank" rel="noreferrer" className="pf-mono" style={{ fontSize: 12, color: "var(--accent)" }}>View current PDF</a>
-              <button className="pf-btn danger" onClick={async () => { await sbDeleteFile(form.pdf_url, token); setForm({ ...form, pdf_url: "" }); }}><Trash2 size={12} /> Remove</button>
+              <button type="button" className="pf-btn danger" onClick={async () => { await sbDeleteFile(form.pdf_url, token); setForm({ ...form, pdf_url: "" }); }}><Trash2 size={12} /> Remove</button>
             </div>
           ) : (
-            <button className="pf-btn" onClick={() => pdfRef.current.click()} disabled={uploadingPdf}>
+            <button type="button" className="pf-btn" onClick={() => pdfRef.current.click()} disabled={uploadingPdf}>
               <Upload size={13} /> {uploadingPdf ? "Uploading..." : "Upload PDF"}
             </button>
           )}
@@ -748,8 +1150,8 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
 
       {err && <div style={{ color: "#FF6A6A", fontSize: 12, marginTop: 16, marginBottom: 4 }}>{err}</div>}
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-        <button className="pf-btn primary" disabled={saving} onClick={submit}><Check size={13} /> {saving ? "Saving..." : "Save project"}</button>
-        <button className="pf-btn" onClick={onCancel}>Cancel</button>
+        <button type="button" className="pf-btn primary" disabled={saving} onClick={submit}><Check size={13} /> {saving ? "Saving..." : "Save project"}</button>
+        <button type="button" className="pf-btn" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
@@ -775,7 +1177,6 @@ function AdminProjects({ projects, setProjects, token }) {
     const proj = projects.find((p) => p.id === id);
     await sbDelete("projects", id, token);
     setProjects(projects.filter((p) => p.id !== id));
-    // Clean up its images and PDF in storage too, so nothing is left orphaned
     if (proj) {
       for (const img of proj.images || []) await sbDeleteFile(img.url, token);
       if (proj.image_url) await sbDeleteFile(proj.image_url, token);
@@ -845,32 +1246,146 @@ function AdminSkills({ meta, setMeta, token }) {
   );
 }
 
+function ProfileImageField({ form, setForm, token }) {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef();
+  const styleOptions = [
+    { value: "portrait", label: "Portrait" },
+    { value: "square", label: "Square" },
+    { value: "circle", label: "Circle" },
+    { value: "rounded_rectangle", label: "Rounded Rectangle" },
+    { value: "landscape", label: "Landscape / Editorial" },
+  ];
+  const aspectOptions = ["4:5", "1:1", "3:4", "16:10", "16:9"];
+  const positionOptions = ["center", "top", "bottom", "left", "right"];
+  const currentAspect = form.profile_image_aspect_ratio || "4:5";
+  const currentStyle = form.profile_image_style || "rounded_rectangle";
+  const currentPosition = form.profile_image_position || "center";
+
+  const handleUpload = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading(true);
+    try {
+      const compressed = await compressImage(file, 1600, 0.8);
+      const url = await sbUploadFile(compressed, token, "profile");
+      const previous = form.profile_image_url;
+      setForm((prev) => ({ ...prev, profile_image_url: url }));
+      if (previous) await sbDeleteFile(previous, token);
+    } catch (error) {
+      alert("Profile image upload failed: " + error.message);
+    }
+    setUploading(false);
+  };
+
+  const removeImage = async () => {
+    if (!form.profile_image_url) return;
+    const previous = form.profile_image_url;
+    setForm((prev) => ({ ...prev, profile_image_url: "" }));
+    await sbDeleteFile(previous, token);
+  };
+
+  return (
+    <div className="pf-profile-manager">
+      <div className="pf-profile-manager-preview">
+        <div className={`pf-profile-frame pf-profile-style-${currentStyle}`} style={{ aspectRatio: currentAspect }}>
+          {form.profile_image_url ? (
+            <img src={form.profile_image_url} alt="Profile preview" style={{ objectPosition: getObjectPosition(currentPosition) }} />
+          ) : (
+            <div className="pf-profile-placeholder"><span>{form.name ? form.name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase() : "NN"}</span></div>
+          )}
+        </div>
+      </div>
+      <div className="pf-profile-manager-actions">
+        <button type="button" className="pf-btn" onClick={() => fileRef.current.click()} disabled={uploading}><Upload size={13} /> {uploading ? "Uploading..." : "Upload image"}</button>
+        {form.profile_image_url && <button type="button" className="pf-btn danger" onClick={removeImage}><Trash2 size={13} /> Remove</button>}
+        <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleUpload} />
+      </div>
+
+      <div className="pf-profile-settings-grid">
+        <div>
+          <label className="pf-label">Display style</label>
+          <div className="pf-option-list">
+            {styleOptions.map((option) => (
+              <button key={option.value} type="button" className={`pf-option-pill ${currentStyle === option.value ? "selected" : ""}`} onClick={() => setForm((prev) => ({ ...prev, profile_image_style: option.value }))}>{option.label}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="pf-label">Aspect ratio</label>
+          <div className="pf-option-list compact">
+            {aspectOptions.map((option) => (
+              <button key={option} type="button" className={`pf-option-pill ${currentAspect === option ? "selected" : ""}`} onClick={() => setForm((prev) => ({ ...prev, profile_image_aspect_ratio: option }))}>{option}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="pf-label">Crop position</label>
+          <div className="pf-option-list compact">
+            {positionOptions.map((option) => (
+              <button key={option} type="button" className={`pf-option-pill ${currentPosition === option ? "selected" : ""}`} onClick={() => setForm((prev) => ({ ...prev, profile_image_position: option }))}>{option}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminAboutContact({ meta, setMeta, token }) {
-  const [form, setForm] = useState(meta);
+  const [form, setForm] = useState(() => ({
+    ...meta,
+    links: { ...DEFAULT_META.links, ...(meta.links || {}) },
+    profile_image_url: meta.profile_image_url || meta.links?.profile_image_url || "",
+    profile_image_style: meta.profile_image_style || meta.links?.profile_image_style || "rounded_rectangle",
+    profile_image_aspect_ratio: meta.profile_image_aspect_ratio || meta.links?.profile_image_aspect_ratio || "4:5",
+    profile_image_position: meta.profile_image_position || meta.links?.profile_image_position || "center",
+  }));
   const [saving, setSaving] = useState(false);
+
   const save = async () => {
     setSaving(true);
     try {
-      await sbUpdateMeta({ name: form.name, role: form.role, tagline: form.tagline, bio: form.bio, email: form.email, links: form.links }, token);
-      setMeta(form);
+      const nextLinks = {
+        ...form.links,
+        profile_image_url: form.profile_image_url,
+        profile_image_style: form.profile_image_style,
+        profile_image_aspect_ratio: form.profile_image_aspect_ratio,
+        profile_image_position: form.profile_image_position,
+      };
+      await sbUpdateMeta({ name: form.name, role: form.role, tagline: form.tagline, bio: form.bio, email: form.email, links: nextLinks }, token);
+      const nextMeta = {
+        ...form,
+        links: nextLinks,
+        profile_image_url: form.profile_image_url,
+        profile_image_style: form.profile_image_style,
+        profile_image_aspect_ratio: form.profile_image_aspect_ratio,
+        profile_image_position: form.profile_image_position,
+      };
+      setMeta(nextMeta);
       alert("Saved.");
     } catch (e) { alert("Save failed: " + e.message); }
     setSaving(false);
   };
+
   return (
-    <div style={{ maxWidth: 560 }}>
-      <label className="pf-label">Name</label><input className="pf-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={{ marginBottom: 14 }} />
-      <label className="pf-label">Role / title</label><input className="pf-input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} style={{ marginBottom: 14 }} />
-      <label className="pf-label">Homepage tagline</label><input className="pf-input" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} style={{ marginBottom: 14 }} />
-      <label className="pf-label">About / bio</label><textarea className="pf-input" rows={5} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} style={{ marginBottom: 14, resize: "vertical" }} />
-      <label className="pf-label">Email</label><input className="pf-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={{ marginBottom: 14 }} />
-      {["github", "linkedin", "itch", "artstation", "other"].map((k) => (
-        <div key={k}>
-          <label className="pf-label">{k === "other" ? "Other link" : k[0].toUpperCase() + k.slice(1)}</label>
-          <input className="pf-input" value={form.links[k]} onChange={(e) => setForm({ ...form, links: { ...form.links, [k]: e.target.value } })} style={{ marginBottom: 14 }} placeholder="https://..." />
-        </div>
-      ))}
-      <button className="pf-btn primary" disabled={saving} onClick={save}><Check size={13} /> {saving ? "Saving..." : "Save"}</button>
+    <div style={{ maxWidth: 760 }}>
+      <ProfileImageField form={form} setForm={setForm} token={token} />
+      <div style={{ marginTop: 20 }}>
+        <label className="pf-label">Name</label><input className="pf-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={{ marginBottom: 14 }} />
+        <label className="pf-label">Role / title</label><input className="pf-input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} style={{ marginBottom: 14 }} />
+        <label className="pf-label">Homepage tagline</label><input className="pf-input" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} style={{ marginBottom: 14 }} />
+        <label className="pf-label">About / bio</label><textarea className="pf-input" rows={5} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} style={{ marginBottom: 14, resize: "vertical" }} />
+        <label className="pf-label">Email</label><input className="pf-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={{ marginBottom: 14 }} />
+        {Object.keys(form.links || {}).filter((k) => k !== "profile_image_url" && k !== "profile_image_style" && k !== "profile_image_aspect_ratio" && k !== "profile_image_position").map((k) => (
+          <div key={k}>
+            <label className="pf-label">{k === "other" ? "Other link" : k[0].toUpperCase() + k.slice(1)}</label>
+            <input className="pf-input" value={form.links[k]} onChange={(e) => setForm({ ...form, links: { ...form.links, [k]: e.target.value } })} style={{ marginBottom: 14 }} placeholder="https://..." />
+          </div>
+        ))}
+        <button className="pf-btn primary" disabled={saving} onClick={save}><Check size={13} /> {saving ? "Saving..." : "Save"}</button>
+      </div>
     </div>
   );
 }
@@ -886,7 +1401,7 @@ function Admin({ projects, setProjects, meta, setMeta }) {
         <button className="pf-btn" onClick={() => setToken(null)}><LogOut size={13} /> Log out</button>
       </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 24, borderBottom: "1px solid var(--line)", paddingBottom: 14 }}>
-        {[["projects", "Projects"], ["skills", "Skills"], ["about", "About & Contact"]].map(([id, label]) => (
+        {[ ["projects", "Projects"], ["skills", "Skills"], ["about", "About & Contact"] ].map(([id, label]) => (
           <button key={id} className={`pf-nav-tab ${tab === id ? "active" : ""}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -897,9 +1412,6 @@ function Admin({ projects, setProjects, meta, setMeta }) {
   );
 }
 
-/* ============================================================
-   APP
-   ============================================================ */
 export default function App() {
   const [route, setRoute] = useState({ page: "home" });
   const [projects, setProjects] = useState([]);
@@ -914,7 +1426,19 @@ export default function App() {
       try {
         const [p, m] = await Promise.all([sbGet("projects?order=date.desc"), sbGet("site_meta?id=eq.1")]);
         setProjects(p);
-        if (m[0]) setMeta({ ...DEFAULT_META, ...m[0], links: { ...DEFAULT_META.links, ...(m[0].links || {}) }, skills: m[0].skills?.length ? m[0].skills : DEFAULT_META.skills });
+        if (m[0]) {
+          const profile = getProfileImageConfig(m[0]);
+          setMeta({
+            ...DEFAULT_META,
+            ...m[0],
+            links: { ...DEFAULT_META.links, ...(m[0].links || {}) },
+            profile_image_url: profile.url,
+            profile_image_style: profile.style,
+            profile_image_aspect_ratio: profile.aspect,
+            profile_image_position: profile.position,
+            skills: m[0].skills?.length ? m[0].skills : DEFAULT_META.skills,
+          });
+        }
       } catch (e) {
         setLoadErr(e.message);
       }
