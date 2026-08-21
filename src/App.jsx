@@ -297,7 +297,8 @@ const GlobalStyle = () => (
       border-bottom: 1px solid var(--line);
     }
     .pf-project-visual img {
-      width: 100%; height: 100%; display: block; object-fit: cover; transition: transform 0.35s ease;
+      width: 100%; height: 100%; display: block; object-fit: cover; object-position: center bottom;
+      transition: transform 0.35s ease;
     }
     .pf-project-card:hover .pf-project-visual img { transform: scale(1.04); }
     .pf-project-overlay {
