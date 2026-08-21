@@ -236,6 +236,23 @@ const GlobalStyle = () => (
       box-shadow: 0 0 18px rgba(125, 253, 200, 0.75);
       display: inline-block;
     }
+    .pf-stats {
+      display: flex; align-items: stretch; gap: 0; margin-top: 22px; width: min(100%, 420px);
+      border: 1px solid var(--line); background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(18,24,33,0.72));
+      border-radius: 16px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .pf-stat {
+      flex: 1; padding: 16px 18px; min-width: 0;
+    }
+    .pf-stat + .pf-stat { border-left: 1px solid var(--line); }
+    .pf-stat-value {
+      display: block; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700;
+      line-height: 1; margin-bottom: 8px;
+    }
+    .pf-stat-label {
+      display: block; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+    }
 
     .pf-profile-frame {
       position: relative; width: 100%; border-radius: 28px; background: linear-gradient(180deg, rgba(167,139,250,0.12), rgba(12,14,20,0.15));
@@ -270,7 +287,8 @@ const GlobalStyle = () => (
     }
     .pf-project-card {
       width: 100%; border-radius: 18px; overflow: hidden; text-align: left;
-      background: rgba(18, 24, 33, 0.86); border: 1px solid var(--line); cursor: pointer; padding: 0;
+      background: linear-gradient(145deg, rgba(35, 40, 57, 0.98), rgba(18, 24, 33, 0.94) 55%, rgba(13, 16, 24, 0.98));
+      color: var(--text); border: 1px solid var(--line); cursor: pointer; padding: 0;
       transition: transform 0.18s ease, border-color 0.18s ease;
     }
     .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.5); }
@@ -291,13 +309,13 @@ const GlobalStyle = () => (
       padding: 5px 8px; border-radius: 999px; font-size: 9px; letter-spacing: 0.08em;
     }
     .pf-project-body {
-      padding: 16px 16px 18px;
+      padding: 16px 16px 18px; background: linear-gradient(180deg, rgba(30, 36, 51, 0.74), rgba(16, 21, 30, 0.92));
     }
     .pf-project-head {
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;
     }
     .pf-project-head h3 {
-      margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -0.03em;
+      margin: 0; color: var(--text); font-size: 18px; line-height: 1.3; letter-spacing: -0.03em;
     }
     .pf-project-body p {
       margin: 0; color: rgba(237,242,248,0.74); font-size: 14px; line-height: 1.65;
@@ -633,6 +651,7 @@ function Home({ meta, projects, setRoute, openProject }) {
   const firstCategory = CATEGORIES[0]?.id || "games";
   const skillsPreview = meta.skills.flatMap((g) => g.items).slice(0, 14);
   const profile = getProfileImageConfig(meta);
+  const disciplineCount = new Set(projects.map((project) => project.category).filter(Boolean)).size;
 
   return (
     <div style={{ maxWidth: 1160, margin: "0 auto", padding: "56px 20px 40px" }}>
@@ -645,6 +664,11 @@ function Home({ meta, projects, setRoute, openProject }) {
           <div className="pf-actions">
             <button type="button" className="pf-btn primary" onClick={() => setRoute({ page: firstCategory })}><span>View Work</span> <ArrowRight size={14} /></button>
             <button type="button" className="pf-btn" onClick={() => setRoute({ page: "contact" })}>Contact</button>
+          </div>
+          <div className="pf-stats" aria-label="Portfolio statistics">
+            <div className="pf-stat"><span className="pf-stat-value">{String(projects.length).padStart(2, "0")}</span><span className="pf-stat-label">Projects</span></div>
+            <div className="pf-stat"><span className="pf-stat-value">{String(disciplineCount).padStart(2, "0")}</span><span className="pf-stat-label">Disciplines</span></div>
+            <div className="pf-stat"><span className="pf-stat-value">{skillsPreview.length}</span><span className="pf-stat-label">Skills</span></div>
           </div>
           <div className="pf-status-row">
             <span className="pf-status-dot" />
