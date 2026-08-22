@@ -89,11 +89,12 @@ const GlobalStyle = React.memo(() => (
     :root {
       --bg: #0b0d12;
       --bg-2: #11151d;
-      --surface: #121821;
-      --surface-strong: #161d2a;
-      --surface-soft: #1a2230;
-      --line: rgba(170, 180, 205, 0.16);
-      --line-strong: rgba(170, 180, 205, 0.24);
+      --surface: rgba(24, 30, 42, 0.5);
+      --surface-strong: rgba(30, 38, 54, 0.62);
+      --surface-soft: rgba(36, 46, 64, 0.4);
+      --line: rgba(190, 200, 224, 0.14);
+      --line-strong: rgba(200, 210, 234, 0.24);
+      --glass-highlight: rgba(255, 255, 255, 0.09);
       --text: #edf2f8;
       --muted: #9ca7b8;
       --accent: #a78bfa;
@@ -104,7 +105,11 @@ const GlobalStyle = React.memo(() => (
       --ai-no: #70e0b8;
       --ai-no-soft: rgba(112, 224, 184, 0.12);
       --shadow: 0 18px 48px rgba(1, 4, 12, 0.52);
-      --panel: rgba(19, 25, 35, 0.86);
+      --panel: rgba(19, 25, 35, 0.55);
+      --glass-blur: blur(28px) saturate(200%);
+      --glass-blur-soft: blur(16px) saturate(160%);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --surface-2: var(--surface-soft);
     }
 
     html { scroll-behavior: smooth; }
@@ -112,50 +117,90 @@ const GlobalStyle = React.memo(() => (
     a { color: inherit; }
     button, input, select, textarea { font: inherit; }
     .pf-root {
-      background: linear-gradient(180deg, #0b0d12 0%, #111722 100%);
+      position: relative;
+      isolation: isolate;
+      background: #0b0d12;
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       width: 100%;
     }
+    .pf-root::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(150deg, #1c1533 0%, #171029 18%, #120f22 38%, #0e0f1a 58%, #0b0c14 78%, #08090f 100%);
+    }
+    .pf-root::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(1400px 900px at 20% 0%, rgba(167,139,250,0.16), transparent 60%);
+    }
+    .pf-root > * { position: relative; z-index: 1; }
     .pf-root * { box-sizing: border-box; }
     .pf-mono { font-family: 'JetBrains Mono', monospace; }
     .pf-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-    .pf-scrollbar::-webkit-scrollbar-thumb { background: rgba(170,180,205,0.2); border-radius: 999px; }
-    .pf-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .pf-scrollbar::-webkit-scrollbar-thumb { background: rgba(170,180,205,0.34); border-radius: 999px; }
+    .pf-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 999px; }
+    .pf-mobile-scrollbar { display: none; }
 
     .pf-badge {
       display: inline-flex; align-items: center; gap: 6px;
       font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
       text-transform: uppercase; padding: 5px 9px; border-radius: 999px; border: 1px solid;
-      white-space: nowrap;
+      white-space: nowrap; backdrop-filter: var(--glass-blur-soft); -webkit-backdrop-filter: var(--glass-blur-soft);
     }
-    .pf-badge.yes { color: #ffc27d; background: rgba(35, 27, 18, 0.94); border-color: rgba(247,178,103,0.62); box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
-    .pf-badge.no { color: #8af0c9; background: rgba(14, 37, 34, 0.94); border-color: rgba(112,224,184,0.58); box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
+    .pf-badge.yes { color: #ffc27d; background: rgba(35, 27, 18, 0.6); border-color: rgba(247,178,103,0.62); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.24); }
+    .pf-badge.no { color: #8af0c9; background: rgba(14, 37, 34, 0.6); border-color: rgba(112,224,184,0.58); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.24); }
 
     .pf-card {
-      background: rgba(18, 24, 33, 0.86);
-      border: 1px solid var(--line);
-      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-      border-radius: 18px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      position: relative;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.4s var(--spring), border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      border-radius: 22px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.35),
+        inset 0 -1px 0 rgba(255,255,255,0.04),
+        inset 1px 0 0 rgba(255,255,255,0.06),
+        0 1px 2px rgba(0,0,0,0.2),
+        0 12px 28px rgba(4,6,12,0.28);
+    }
+    .pf-card::before {
+      content: "";
+      position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+      background: linear-gradient(165deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 30%, transparent 55%);
     }
     .pf-card:hover {
-      border-color: rgba(167,139,250,0.5);
-      transform: translateY(-2px);
-      box-shadow: 0 18px 30px rgba(10, 12, 18, 0.45);
+      border-color: rgba(167,139,250,0.55);
+      transform: translateY(-3px) scale(1.008);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.45),
+        inset 0 -1px 0 rgba(255,255,255,0.04),
+        0 1px 2px rgba(0,0,0,0.2),
+        0 20px 40px rgba(10, 12, 18, 0.4);
+      background: var(--surface-strong);
     }
+    .pf-card:active { transform: translateY(-1px) scale(0.99); transition: transform 0.15s ease; }
 
     .pf-nav-tab {
       font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
       color: var(--muted); padding: 8px 12px; border: 1px solid transparent; cursor: pointer;
       white-space: nowrap; background: transparent; display: inline-flex; align-items: center; gap: 6px;
-      border-radius: 999px; transition: all 0.18s ease;
+      border-radius: 999px; transition: all 0.3s var(--spring);
     }
-    .pf-nav-tab:hover { color: var(--text); border-color: var(--line); }
+    .pf-nav-tab:hover { color: var(--text); border-color: rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); }
+    .pf-nav-tab:active { transform: scale(0.94); }
     .pf-nav-tab.active {
-      color: var(--text); border-color: rgba(180, 190, 214, 0.38); background: rgba(255,255,255,0.04);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      color: var(--text); border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(255,255,255,0.02);
     }
     .pf-nav-divider {
       width: 1px; height: 20px; align-self: center; background: rgba(190, 200, 224, 0.42); margin: 0 8px;
@@ -164,18 +209,25 @@ const GlobalStyle = React.memo(() => (
     .pf-nav-tab.secondary-nav { color: #687386; }
     .pf-nav-tab.secondary-nav:hover, .pf-nav-tab.secondary-nav.active { color: var(--text); }
     .pf-btn {
+      position: relative; overflow: hidden;
       font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
-      padding: 10px 16px; border: 1px solid var(--line); background: rgba(255,255,255,0.01);
+      padding: 10px 16px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: var(--glass-blur-soft); -webkit-backdrop-filter: var(--glass-blur-soft);
       color: var(--text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-      gap: 8px; transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+      gap: 8px; transition: transform 0.3s var(--spring), border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
       border-radius: 999px; text-transform: uppercase;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(255,255,255,0.03), 0 1px 3px rgba(0,0,0,0.15);
     }
-    .pf-btn:hover { border-color: rgba(167,139,250,0.5); transform: translateY(-1px); }
+    .pf-btn:hover { border-color: rgba(167,139,250,0.55); transform: translateY(-1px); background: rgba(255,255,255,0.1); }
+    .pf-btn:active { transform: translateY(0) scale(0.95); transition: transform 0.15s ease; }
     .pf-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .pf-btn.primary {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-      border-color: transparent; color: #0f1220; font-weight: 700;
+      background: linear-gradient(160deg, rgba(255,255,255,0.3), transparent 40%), linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-color: rgba(255,255,255,0.3); color: #0f1220; font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 6px 18px rgba(139,92,246,0.35);
     }
+    .pf-btn.primary:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 10px 26px rgba(139,92,246,0.45); }
     .pf-btn.danger:hover { border-color: rgba(255,107,107,0.7); color: #ffb4b4; }
     .pf-pdf-link {
       background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(139,92,246,0.12));
@@ -193,6 +245,13 @@ const GlobalStyle = React.memo(() => (
       text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px;
     }
     .pf-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .pf-form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
+    }
+    .pf-admin-row {
+      display: flex; align-items: center; gap: 14px; border: 1px solid var(--line);
+      padding: 12px; background: var(--surface); border-radius: 14px; flex-wrap: wrap;
+    }
 
     .pf-page-transition { animation: pf-fade-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
     .pf-card-in { animation: pf-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
@@ -298,13 +357,14 @@ const GlobalStyle = React.memo(() => (
     }
     .pf-project-card {
       width: 100%; border-radius: 18px; overflow: hidden; text-align: left;
-      background: linear-gradient(145deg, rgba(35, 42, 58, 0.98), rgba(22, 29, 41, 0.98) 55%, rgba(17, 21, 30, 0.99));
-      color: var(--text); border: 1px solid rgba(164, 176, 201, 0.27); cursor: pointer; padding: 0;
+      background: linear-gradient(145deg, rgba(45, 54, 74, 0.5), rgba(28, 36, 52, 0.5) 55%, rgba(20, 25, 36, 0.55));
+      color: var(--text); border: 1px solid var(--glass-highlight); cursor: pointer; padding: 0;
       display: flex; flex-direction: column; height: 100%;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 14px 30px rgba(0,0,0,0.16);
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: inset 0 1px 0 var(--glass-highlight), 0 14px 30px rgba(0,0,0,0.16);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
-    .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.62); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 34px rgba(0,0,0,0.28); }
+    .pf-project-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.55); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 18px 34px rgba(0,0,0,0.28); }
     .pf-project-visual {
       position: relative; width: 100%; height: 260px; overflow: hidden; background: #111827;
       border-bottom: 1px solid var(--line);
@@ -319,12 +379,13 @@ const GlobalStyle = React.memo(() => (
       display: flex; align-items: flex-end; justify-content: space-between; padding: 14px;
     }
     .pf-project-category {
-      color: #f2f5fb; background: rgba(10, 13, 19, 0.9); border: 1px solid rgba(207,216,235,0.34);
+      color: #f2f5fb; background: rgba(10, 13, 19, 0.7); border: 1px solid rgba(207,216,235,0.34);
       padding: 5px 8px; border-radius: 999px; font-size: 9px; letter-spacing: 0.08em;
       box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .pf-project-body {
-      padding: 16px 16px 18px; background: linear-gradient(180deg, rgba(30, 36, 51, 0.74), rgba(16, 21, 30, 0.92));
+      padding: 16px 16px 18px; background: linear-gradient(180deg, rgba(38, 45, 63, 0.4), rgba(18, 23, 33, 0.55));
       display: flex; flex: 1; flex-direction: column;
     }
     .pf-project-head {
@@ -359,10 +420,12 @@ const GlobalStyle = React.memo(() => (
       display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
     }
     .pf-capability-card {
-      text-align: left; border: 1px solid var(--line); background: rgba(18,24,33,0.82); border-radius: 18px;
-      padding: 18px; color: var(--text); cursor: pointer; transition: border-color 0.18s ease, transform 0.18s ease;
+      text-align: left; border: 1px solid rgba(255,255,255,0.12); background: var(--surface); border-radius: 20px;
+      padding: 18px; color: var(--text); cursor: pointer; transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.15), 0 12px 24px rgba(4,6,12,0.22);
     }
-    .pf-capability-card:hover { border-color: rgba(167,139,250,0.5); transform: translateY(-2px); }
+    .pf-capability-card:hover { border-color: rgba(167,139,250,0.5); transform: translateY(-2px); background: var(--surface-strong); }
     .pf-capability-topline {
       display: flex; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 12px;
     }
@@ -378,14 +441,18 @@ const GlobalStyle = React.memo(() => (
       display: flex; flex-wrap: wrap; gap: 8px;
     }
     .pf-skill-card {
-      border: 1px solid var(--line); background: rgba(18,24,33,0.82); border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12); background: var(--surface); border-radius: 20px;
       padding: 18px; margin-bottom: 18px;
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.15), 0 12px 24px rgba(4,6,12,0.22);
     }
 
     .pf-about-preview { margin-top: 30px; }
     .pf-about-panel {
-      border: 1px solid var(--line); background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(18,24,33,0.82));
+      border: 1px solid var(--line); background: linear-gradient(135deg, rgba(167,139,250,0.1), var(--surface));
       border-radius: 22px; padding: 26px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.15), 0 12px 24px rgba(4,6,12,0.22);
     }
     .pf-about-panel h3 { margin: 10px 0 10px; font-size: clamp(24px, 2vw, 38px); letter-spacing: -0.04em; }
     .pf-about-panel p { margin: 0; color: rgba(237,242,248,0.74); line-height: 1.7; max-width: 640px; }
@@ -447,7 +514,9 @@ const GlobalStyle = React.memo(() => (
     .pf-contact-item:hover { border-color: rgba(167,139,250,0.5); }
 
     .pf-profile-manager {
-      border: 1px solid var(--line); background: rgba(18,24,33,0.82); padding: 20px; border-radius: 18px;
+      border: 1px solid var(--line); background: var(--surface); padding: 20px; border-radius: 18px;
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.15), 0 12px 24px rgba(4,6,12,0.22);
     }
     .pf-profile-manager-preview {
       display: flex; justify-content: center; margin-bottom: 18px;
@@ -456,8 +525,17 @@ const GlobalStyle = React.memo(() => (
       display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px;
     }
     .pf-nav-inner {
-      max-width: 1440px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center;
+      max-width: 1320px; margin: 12px auto; padding: 10px 18px; display: flex; align-items: center;
       justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      background: rgba(20, 24, 34, 0.45);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        inset 0 -1px 0 rgba(255,255,255,0.03),
+        0 8px 24px rgba(0,0,0,0.35),
+        0 1px 2px rgba(0,0,0,0.2);
     }
     .pf-profile-settings-grid {
       display: grid; gap: 16px;
@@ -484,10 +562,44 @@ const GlobalStyle = React.memo(() => (
     }
 
     @media (max-width: 640px) {
-      .pf-nav-inner { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 16px; }
-      .pf-nav-inner > div:nth-child(2) { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; width: calc(100vw - 32px); }
+      .pf-nav-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; margin: 8px auto; width: 100%; min-width: 0; }
+      .pf-nav-inner > div:nth-child(2) {
+        grid-column: 1 / -1; grid-row: 2; justify-content: flex-start !important; gap: 2px !important;
+        width: 100%; max-width: 100%; min-width: 0; margin-left: 0; padding: 0;
+        position: relative; top: -6px;
+        scrollbar-width: none;
+      }
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar { display: none; }
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-button,
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-button:single-button,
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-button:start:decrement,
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-button:end:increment {
+        display: none !important; width: 0; height: 0; background: transparent !important; background-image: none !important;
+      }
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, rgba(232,238,248,0.52), rgba(170,180,205,0.32) 42%, rgba(96,106,124,0.42));
+        border: 2px solid transparent; border-left-width: 32px; border-right-width: 32px;
+        border-radius: 999px; background-clip: padding-box;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.38), inset 0 -1px 0 rgba(0,0,0,0.28);
+      }
+      .pf-nav-inner > div:nth-child(2)::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 999px; }
+      .pf-mobile-scrollbar {
+        display: block; position: relative; grid-column: 1 / -1; grid-row: 3; height: 6px;
+        margin: -2px 14px 0; border-radius: 999px; background: rgba(255,255,255,0.06);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.22);
+        cursor: pointer;
+      }
+      .pf-mobile-scrollbar-thumb {
+        position: absolute; top: 0; left: 0; width: 40%; height: 6px; border-radius: 999px;
+        background: linear-gradient(180deg, rgba(232,238,248,0.52), rgba(170,180,205,0.32) 42%, rgba(96,106,124,0.42));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.38), inset 0 -1px 0 rgba(0,0,0,0.28);
+        cursor: grab; touch-action: none;
+      }
+      .pf-mobile-scrollbar-thumb:active { cursor: grabbing; }
+      .pf-nav-inner > div:first-child { margin-left: 16px; }
       .pf-nav-inner > button { justify-self: end; }
-      .pf-nav-tab { font-size: 10px; padding: 8px 10px; }
+      .pf-nav-inner > button { margin-right: 15px; }
+      .pf-nav-tab { font-size: 10px; padding: 7px 9px; }
       .pf-hero { padding: 28px 0 18px; margin-bottom: 26px; }
       .pf-hero-copy h1 { font-size: 42px; }
       .pf-tagline { font-size: 17px; line-height: 1.45; }
@@ -504,6 +616,27 @@ const GlobalStyle = React.memo(() => (
       .pf-about-panel { padding: 18px; }
       .pf-profile-manager { padding: 16px; }
       .pf-btn, .pf-nav-tab { padding-left: 12px; padding-right: 12px; }
+
+      /* Prevent iOS Safari from zooming in when a form field is focused
+         (it auto-zooms on any input/select/textarea under 16px font-size) */
+      .pf-input, select.pf-input, textarea.pf-input { font-size: 16px; }
+
+      /* Stack two-column admin form rows into one column on narrow screens */
+      .pf-form-row { grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
+
+      /* Tighter padding inside the project modal so content isn't cramped */
+      .pf-modal-body { padding: 18px !important; }
+
+      /* Let admin project rows wrap instead of overflowing horizontally */
+      .pf-admin-row { padding: 10px; }
+      .pf-admin-row > div:nth-child(2) { flex-basis: 100%; order: 1; }
+      .pf-admin-row > *:not(div:nth-child(2)) { order: 2; }
+    }
+
+    @media (max-width: 400px) {
+      .pf-hero-copy h1 { font-size: 34px; }
+      .pf-stats { grid-template-columns: 1fr; display: grid; }
+      .pf-stat + .pf-stat { border-left: none; border-top: 1px solid var(--line); }
     }
   `}</style>
 ));
@@ -660,19 +793,62 @@ const ProjectCard = React.memo(function ProjectCard({ project, onOpen, index = 0
 });
 
 function Nav({ route, setRoute, meta }) {
+  const navScrollRef = useRef(null);
+  const navScrollThumbRef = useRef(null);
+  const navDragRef = useRef(null);
   const tabs = [
     ...CATEGORIES.map((c) => ({ id: c.id, label: c.short, icon: c.icon })),
     { id: "skills", label: "SKILLS" },
     { id: "about", label: "ABOUT" },
     { id: "contact", label: "CONTACT" },
   ];
+  useEffect(() => {
+    if (navScrollRef.current) {
+      navScrollRef.current.scrollLeft = 0;
+      if (navScrollThumbRef.current) navScrollThumbRef.current.style.left = "0%";
+    }
+  }, [route.page]);
+  const updateNavScroll = () => {
+    const element = navScrollRef.current;
+    if (!element) return;
+    const maxScroll = element.scrollWidth - element.clientWidth;
+    const progress = maxScroll > 0 ? element.scrollLeft / maxScroll : 0;
+    if (navScrollThumbRef.current) navScrollThumbRef.current.style.left = `${progress * 60}%`;
+  };
+  const seekNavScroll = (event) => {
+    const element = navScrollRef.current;
+    if (!element) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+    element.scrollLeft = ratio * (element.scrollWidth - element.clientWidth);
+  };
+  const startNavDrag = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    navDragRef.current = { startX: event.clientX, startScroll: navScrollRef.current?.scrollLeft || 0 };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const moveNavDrag = (event) => {
+    const drag = navDragRef.current;
+    const element = navScrollRef.current;
+    if (!drag || !element) return;
+    const trackWidth = event.currentTarget.parentElement.clientWidth;
+    const thumbWidth = event.currentTarget.clientWidth;
+    const maxScroll = element.scrollWidth - element.clientWidth;
+    const maxThumbOffset = Math.max(1, trackWidth - thumbWidth);
+    element.scrollLeft = drag.startScroll + ((event.clientX - drag.startX) / maxThumbOffset) * maxScroll;
+  };
+  const endNavDrag = (event) => {
+    navDragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(11,13,18,0.82)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
+    <div style={{ position: "sticky", top: 0, zIndex: 20, padding: "0 16px" }}>
       <div className="pf-nav-inner">
         <div className="pf-mono" style={{ fontWeight: 800, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onClick={() => setRoute({ page: "home" })}>
           <Terminal size={16} color="var(--accent)" /> {meta.name}
         </div>
-        <div className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto", flex: 1, justifyContent: "center" }}>
+        <div ref={navScrollRef} onScroll={updateNavScroll} className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto", flex: 1, justifyContent: "center" }}>
           {tabs.map((t, index) => (
             <React.Fragment key={t.id}>
               {index === CATEGORIES.length && <span className="pf-nav-divider" aria-hidden="true" />}
@@ -682,6 +858,9 @@ function Nav({ route, setRoute, meta }) {
               </button>
             </React.Fragment>
           ))}
+        </div>
+        <div className="pf-mobile-scrollbar" onClick={seekNavScroll} aria-hidden="true">
+          <span ref={navScrollThumbRef} className="pf-mobile-scrollbar-thumb" onPointerDown={startNavDrag} onPointerMove={moveNavDrag} onPointerUp={endNavDrag} onPointerCancel={endNavDrag} onClick={(event) => event.stopPropagation()} />
         </div>
         <button className="pf-nav-tab" onClick={() => setRoute({ page: "admin" })}><Lock size={12} /> ADMIN</button>
       </div>
@@ -721,7 +900,7 @@ function Home({ meta, projects, setRoute, openProject }) {
     <div style={{ maxWidth: 1440, margin: "0 auto", padding: "56px 24px 40px" }}>
       <section className="pf-hero">
         <div className="pf-hero-copy">
-          <div className="pf-mono pf-kicker">$ whoami --role="{meta.role}"</div>
+          <div className="pf-mono pf-kicker">{meta.role}</div>
           <h1>{meta.name}</h1>
           <p className="pf-tagline">{meta.tagline}</p>
           <p className="pf-lead">{meta.bio}</p>
@@ -851,11 +1030,6 @@ function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
 
 function ProjectModal({ project, onClose }) {
   const [closing, setClosing] = useState(false);
-  const [shown, setShown] = useState(project);
-
-  useEffect(() => {
-    if (project) { setShown(project); setClosing(false); }
-  }, [project]);
 
   useEffect(() => {
     if (!project) return;
@@ -870,7 +1044,7 @@ function ProjectModal({ project, onClose }) {
   };
 
   if (!project && !closing) return null;
-  const p = shown;
+  const p = project;
   if (!p) return null;
   const groups = IMAGE_GROUPS[p.category] || [];
   const imgs = p.images || [];
@@ -878,7 +1052,7 @@ function ProjectModal({ project, onClose }) {
 
   return (
     <div className={`pf-modal-backdrop ${closing ? "closing" : ""}`} style={{ position: "fixed", inset: 0, background: "rgba(2,4,8,0.82)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={handleClose}>
-      <div role="dialog" aria-modal="true" className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface)", border: "1px solid var(--line)", maxWidth: 960, width: "100%", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 26px 80px rgba(0,0,0,0.42)" }} onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className={`pf-scrollbar pf-modal-panel ${closing ? "closing" : ""}`} style={{ background: "var(--surface-strong)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid var(--glass-highlight)", maxWidth: 960, width: "100%", maxHeight: "92vh", overflowY: "auto", boxShadow: "inset 0 1px 0 var(--glass-highlight), 0 26px 80px rgba(0,0,0,0.5)" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ position: "sticky", top: 0, zIndex: 2, display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "14px 20px", background: "rgba(18,20,27,0.96)", backdropFilter: "blur(6px)", borderBottom: "1px solid var(--line)" }}>
           <button className="pf-btn" onClick={handleClose} aria-label="Close project details"><X size={14} /></button>
         </div>
@@ -889,7 +1063,7 @@ function ProjectModal({ project, onClose }) {
           </div>
         )}
 
-        <div style={{ padding: 28 }}>
+        <div className="pf-modal-body" style={{ padding: 28 }}>
           <div className="pf-mono pf-section-label">{CATEGORIES.find((c) => c.id === p.category)?.short || "PROJECT"}</div>
           <h3 style={{ margin: "8px 0 0", fontSize: "clamp(29px, 3vw, 42px)", lineHeight: 1.1 }}>{p.title}</h3>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "14px 0" }}>
@@ -1183,9 +1357,9 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
   };
 
   return (
-    <div style={{ border: "1px solid var(--line)", background: "var(--surface)", padding: 20, marginBottom: 20 }}>
+    <div style={{ border: "1px solid var(--line)", background: "var(--surface)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", padding: 20, marginBottom: 20, borderRadius: 14 }}>
       <div className="pf-mono" style={{ fontSize: 12, color: "var(--accent)", marginBottom: 16 }}>{initial ? "// EDIT PROJECT" : "// NEW PROJECT"}</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      <div className="pf-form-row">
         <div><label className="pf-label">Title</label><input className="pf-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
         <div><label className="pf-label">Category</label>
           <select className="pf-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
@@ -1195,7 +1369,7 @@ function ProjectForm({ initial, token, onSave, onCancel }) {
       </div>
       <label className="pf-label">Description</label>
       <textarea className="pf-input" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} style={{ marginBottom: 14, resize: "vertical" }} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      <div className="pf-form-row">
         <div><label className="pf-label">Your role</label><input className="pf-input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="e.g. Solo developer" /></div>
         <div><label className="pf-label">Date</label><input type="date" className="pf-input" value={form.date || ""} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
       </div>
@@ -1296,7 +1470,7 @@ function AdminProjects({ projects, setProjects, token }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {projects.length === 0 && <div style={{ color: "var(--muted)" }}>No projects yet.</div>}
           {projects.map((p) => (
-            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 14, border: "1px solid var(--line)", padding: 12, background: "var(--surface)" }}>
+            <div key={p.id} className="pf-admin-row">
               <div style={{ width: 44, height: 44, background: "var(--surface-2)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {thumbnailOf(p) ? <img src={thumbnailOf(p)} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <CategoryIcon id={p.category} size={18} />}
               </div>
@@ -1333,7 +1507,7 @@ function AdminSkills({ meta, setMeta, token }) {
   return (
     <div>
       {skills.map((g, i) => (
-        <div key={i} style={{ border: "1px solid var(--line)", padding: 14, marginBottom: 12, background: "var(--surface)" }}>
+        <div key={i} style={{ border: "1px solid var(--line)", padding: 14, marginBottom: 12, background: "var(--surface)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", borderRadius: 14 }}>
           <label className="pf-label">Group name</label>
           <input className="pf-input" value={g.group} onChange={(e) => updateGroup(i, "group", e.target.value)} style={{ marginBottom: 10 }} />
           <label className="pf-label">Skills (comma separated)</label>
