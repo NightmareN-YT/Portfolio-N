@@ -270,7 +270,12 @@ const GlobalStyle = React.memo(() => (
       display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;
       font-size: 10px; color: #c9b8ff; margin-top: 1px;
     }
-    .pf-ai-msg-assistant-text { font-size: 13.5px; line-height: 1.6; color: rgba(237,242,248,0.92); white-space: pre-wrap; }
+    .pf-ai-msg-assistant-text { font-size: 13.5px; line-height: 1.6; color: rgba(237,242,248,0.92); }
+    .pf-ai-msg-assistant-text p { margin: 0 0 8px; }
+    .pf-ai-msg-assistant-text p:last-child { margin-bottom: 0; }
+    .pf-ai-msg-assistant-text ul { margin: 4px 0 8px; padding-left: 18px; }
+    .pf-ai-msg-assistant-text li { margin-bottom: 4px; }
+    .pf-ai-msg-assistant-text strong { color: #ede8ff; font-weight: 700; }
     .pf-ai-typing { display: flex; gap: 4px; padding: 4px 0; }
     .pf-ai-typing span { width: 5px; height: 5px; border-radius: 50%; background: rgba(237,242,248,0.5); animation: pf-typing-bounce 1.1s ease infinite; }
     .pf-ai-typing span:nth-child(2) { animation-delay: 0.15s; }
@@ -900,6 +905,41 @@ function AiStatusLabel({ status }) {
   );
 }
 
+// Lightweight formatter for AI replies — handles **bold** and bullet lists
+// (the two things models reliably produce) without pulling in a full
+// markdown library. Returns JSX, so there's no HTML-injection risk.
+function formatAiText(text) {
+  const lines = String(text || "").split("\n");
+  const blocks = [];
+  let currentList = null;
+
+  const renderInline = (line, key) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+    return (
+      <React.Fragment key={key}>
+        {parts.map((part, j) =>
+          part.startsWith("**") && part.endsWith("**")
+            ? <strong key={j}>{part.slice(2, -2)}</strong>
+            : <React.Fragment key={j}>{part}</React.Fragment>
+        )}
+      </React.Fragment>
+    );
+  };
+
+  lines.forEach((line, i) => {
+    const bulletMatch = line.match(/^\s*[*-]\s+(.*)/);
+    if (bulletMatch) {
+      if (!currentList) { currentList = []; }
+      currentList.push(<li key={i}>{renderInline(bulletMatch[1], i)}</li>);
+    } else {
+      if (currentList) { blocks.push(<ul key={`ul-${i}`}>{currentList}</ul>); currentList = null; }
+      if (line.trim()) blocks.push(<p key={i}>{renderInline(line, i)}</p>);
+    }
+  });
+  if (currentList) blocks.push(<ul key="ul-end">{currentList}</ul>);
+  return blocks;
+}
+
 function AiChatPanel({ variant, messages, status, loading, onSend, onClose }) {
   const [draft, setDraft] = useState("");
   const listRef = useRef(null);
@@ -941,7 +981,7 @@ function AiChatPanel({ variant, messages, status, loading, onSend, onClose }) {
         ) : (
           <div key={i} className="pf-ai-msg-assistant">
             <div className="pf-ai-msg-assistant-icon">&gt;_</div>
-            <div className="pf-ai-msg-assistant-text">{m.content}</div>
+            <div className="pf-ai-msg-assistant-text">{formatAiText(m.content)}</div>
           </div>
         ))}
         {loading && (

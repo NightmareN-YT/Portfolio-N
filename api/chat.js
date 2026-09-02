@@ -7,13 +7,13 @@ const SUPABASE_URL = "https://fktnbldkjgoouzsidraf.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrdG5ibGRramdvb3V6c2lkcmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyODI2ODgsImV4cCI6MjEwMjg1ODY4OH0.d6mSMFqwKMqSZEOw8aFqtxejJhHbfQeYTrdTvpdmSlY";
 
 const OLLAMA_TUNNEL_URL = process.env.OLLAMA_TUNNEL_URL; // e.g. https://your-tunnel.trycloudflare.com
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen-7b-fast:latest";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:7b";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
 const MAX_HISTORY = 10;
 const MAX_MSG_LEN = 2000;
-const MAX_REPLY_TOKENS = 400;
+const MAX_REPLY_TOKENS = 280; // shorter replies = meaningfully faster on constrained local hardware
 
 async function fetchWithTimeout(url, options, ms) {
   const controller = new AbortController();
@@ -41,9 +41,10 @@ async function buildContext() {
       text += "Skills:\n" + meta.skills.map((g) => `- ${g.group}: ${(g.items || []).join(", ")}`).join("\n") + "\n\n";
     }
     if (projects.length) {
-      text += "Projects:\n" + projects.map((p) =>
-        `- "${p.title}" [${p.category}${p.date ? ", " + p.date : ""}]: ${p.description || ""} Tools: ${(p.tools || []).join(", ") || "n/a"}. Role: ${p.role || "n/a"}. AI used: ${p.ai_used ? "yes" + (p.ai_note ? " — " + p.ai_note : "") : "no"}.`
-      ).join("\n");
+      text += "Projects:\n" + projects.map((p) => {
+        const desc = (p.description || "").slice(0, 220);
+        return `- "${p.title}" [${p.category}${p.date ? ", " + p.date : ""}]: ${desc} Tools: ${(p.tools || []).join(", ") || "n/a"}. Role: ${p.role || "n/a"}. AI used: ${p.ai_used ? "yes" + (p.ai_note ? " — " + p.ai_note.slice(0, 120) : "") : "no"}.`;
+      }).join("\n");
     }
     return text;
   } catch {
@@ -71,9 +72,9 @@ async function tryOllama(systemPrompt, messages) {
         messages: [{ role: "system", content: systemPrompt }, ...messages],
         options: { num_predict: MAX_REPLY_TOKENS },
       }),
-    }, 28000); // local CPU generation can genuinely take 10-25s+, especially cold
+    }, 45000); // partial GPU offload on constrained VRAM can genuinely take 30-40s+
   } catch (e) {
-    throw new Error(`Ollama request failed: ${e.name === "AbortError" ? "timed out after 28s" : e.message}`);
+    throw new Error(`Ollama request failed: ${e.name === "AbortError" ? "timed out after 45s" : e.message}`);
   }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
