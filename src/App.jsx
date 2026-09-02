@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Gamepad2, Box, Palette, Sparkles, Lock, Plus, Trash2, Pencil, X,
   ExternalLink, Upload, ChevronLeft, Check, ArrowRight, Mail,
-  Globe, LogOut, Terminal, AlertCircle, Send,
+  Globe, LogOut, Terminal, AlertCircle,
 } from "lucide-react";
 
 const Github = ({ size = 16 }) => (
@@ -208,114 +208,6 @@ const GlobalStyle = React.memo(() => (
     }
     .pf-nav-tab.secondary-nav { color: #687386; }
     .pf-nav-tab.secondary-nav:hover, .pf-nav-tab.secondary-nav.active { color: var(--text); }
-    .pf-nav-tab.ai-tab { font-weight: 700; }
-    .pf-status-dot-ai {
-      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-    .pf-status-dot-ai.local { background: #70e0b8; box-shadow: 0 0 6px rgba(112,224,184,0.8); }
-    .pf-status-dot-ai.cloud { background: #7db8f0; box-shadow: 0 0 6px rgba(125,184,240,0.8); }
-    .pf-status-dot-ai.offline { background: #6b7280; box-shadow: none; }
-    .pf-status-dot-ai.checking { background: #9ca7b8; animation: pf-pulse-dot 1.2s ease infinite; }
-    @keyframes pf-pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-
-    .pf-ai-trigger {
-      position: fixed; bottom: 22px; right: 22px; z-index: 40;
-      display: flex; align-items: center; gap: 8px; padding: 11px 18px 11px 14px;
-      border-radius: 999px; background: rgba(20,16,32,0.72); border: 1px solid rgba(167,139,250,0.45);
-      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 12px 28px rgba(0,0,0,0.4);
-      cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
-      color: #c9b8ff; transition: transform 0.3s var(--spring), border-color 0.2s ease;
-    }
-    .pf-ai-trigger:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.75); }
-    .pf-ai-trigger:active { transform: scale(0.95); }
-
-    .pf-ai-panel {
-      display: flex; flex-direction: column; background: rgba(15,13,22,0.86);
-      border: 1px solid rgba(255,255,255,0.14); border-radius: 20px; overflow: hidden;
-      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 26px 60px rgba(0,0,0,0.45);
-    }
-    .pf-ai-panel.floating {
-      position: fixed; bottom: 22px; right: 22px; z-index: 40;
-      width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100vh - 100px));
-    }
-    .pf-ai-panel.inline { width: 100%; max-width: 720px; margin: 0 auto; height: 640px; max-height: 74vh; }
-
-    .pf-ai-header {
-      display: flex; align-items: center; gap: 10px; padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
-    }
-    .pf-ai-header-mark {
-      width: 28px; height: 28px; border-radius: 9px; background: rgba(167,139,250,0.22);
-      border: 1px solid rgba(167,139,250,0.5); display: flex; align-items: center; justify-content: center;
-      font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #c9b8ff; flex-shrink: 0;
-    }
-    .pf-ai-header-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
-    .pf-ai-header-status { display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.04em; }
-    .pf-ai-header-status.local { color: #70e0b8; }
-    .pf-ai-header-status.cloud { color: #7db8f0; }
-    .pf-ai-header-status.offline { color: #9ca7b8; }
-    .pf-ai-header-status.checking { color: #9ca7b8; }
-
-    .pf-ai-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
-    .pf-ai-msg-user {
-      align-self: flex-end; max-width: 82%; background: rgba(167,139,250,0.22);
-      border: 1px solid rgba(167,139,250,0.32); color: var(--text); font-size: 13px; line-height: 1.5;
-      padding: 9px 13px; border-radius: 14px 14px 3px 14px;
-    }
-    .pf-ai-msg-assistant { display: flex; gap: 9px; max-width: 92%; }
-    .pf-ai-msg-assistant-icon {
-      width: 21px; height: 21px; border-radius: 6px; background: rgba(167,139,250,0.2); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: #c9b8ff; margin-top: 1px;
-    }
-    .pf-ai-msg-assistant-text { font-size: 13.5px; line-height: 1.6; color: rgba(237,242,248,0.92); white-space: pre-wrap; }
-    .pf-ai-typing { display: flex; gap: 4px; padding: 4px 0; }
-    .pf-ai-typing span { width: 5px; height: 5px; border-radius: 50%; background: rgba(237,242,248,0.5); animation: pf-typing-bounce 1.1s ease infinite; }
-    .pf-ai-typing span:nth-child(2) { animation-delay: 0.15s; }
-    .pf-ai-typing span:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes pf-typing-bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }
-
-    .pf-ai-empty { padding: 6px 2px 2px; }
-    .pf-ai-empty p { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
-    .pf-ai-suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pf-ai-chip {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c9b8ff;
-      background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.32);
-      border-radius: 999px; padding: 7px 13px; cursor: pointer; transition: background 0.2s ease, transform 0.2s var(--spring);
-    }
-    .pf-ai-chip:hover { background: rgba(167,139,250,0.22); transform: translateY(-1px); }
-
-    .pf-ai-offline-note {
-      margin: 10px 16px 0; padding: 12px 14px; border-radius: 12px; font-size: 12.5px; line-height: 1.6;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(237,242,248,0.7);
-    }
-
-    .pf-ai-input-row {
-      display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin: 10px 12px 12px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 999px;
-      flex-shrink: 0;
-    }
-    .pf-ai-input-row.disabled { opacity: 0.45; }
-    .pf-ai-input {
-      flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 13px;
-      font-family: 'Inter', sans-serif; padding: 4px 4px 4px 8px;
-    }
-    .pf-ai-input::placeholder { color: rgba(237,242,248,0.35); }
-    .pf-ai-send {
-      width: 30px; height: 30px; border-radius: 50%; background: rgba(167,139,250,0.85); border: none;
-      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
-      color: #14101f; transition: transform 0.2s var(--spring), opacity 0.2s ease;
-    }
-    .pf-ai-send:disabled { opacity: 0.4; cursor: not-allowed; }
-    .pf-ai-send:not(:disabled):active { transform: scale(0.88); }
-
-    @media (max-width: 640px) {
-      .pf-ai-panel.floating { width: calc(100vw - 24px); height: min(70vh, 520px); right: 12px; bottom: 12px; }
-      .pf-ai-trigger { right: 12px; bottom: 12px; padding: 10px 14px 10px 12px; }
-    }
-
     .pf-btn {
       position: relative; overflow: hidden;
       font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
@@ -857,152 +749,6 @@ function compressImage(file, maxDimension = 1200, quality = 0.78) {
   });
 }
 
-async function fetchAiStatus() {
-  try {
-    const res = await fetch("/api/ai-status");
-    if (!res.ok) return { status: "offline" };
-    return await res.json();
-  } catch {
-    return { status: "offline" };
-  }
-}
-
-async function sendAiChat(messages) {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: messages.slice(-10) }),
-  });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || "Request failed");
-  return data; // { reply, backend, model }
-}
-
-const AI_SUGGESTIONS = [
-  "What projects use AI?",
-  "What are your skills?",
-  "Show me 3D work",
-  "How do I contact you?",
-];
-
-function AiStatusLabel({ status }) {
-  const map = {
-    local: "ONLINE · running locally",
-    cloud: "ONLINE · cloud fallback",
-    offline: "OFFLINE · try again later",
-    checking: "CHECKING…",
-  };
-  return (
-    <span className={`pf-ai-header-status ${status}`}>
-      <span className={`pf-status-dot-ai ${status}`} />
-      {map[status] || map.checking}
-    </span>
-  );
-}
-
-function AiChatPanel({ variant, messages, status, loading, onSend, onClose }) {
-  const [draft, setDraft] = useState("");
-  const listRef = useRef(null);
-  const isOffline = status === "offline";
-
-  useEffect(() => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-  }, [messages, loading]);
-
-  const submit = (text) => {
-    const value = (text ?? draft).trim();
-    if (!value || loading || isOffline) return;
-    onSend(value);
-    setDraft("");
-  };
-
-  return (
-    <div className={`pf-ai-panel ${variant}`}>
-      <div className="pf-ai-header">
-        <div className="pf-ai-header-mark">&gt;_</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="pf-ai-header-title">Niyon AI</div>
-          <AiStatusLabel status={status} />
-        </div>
-        {onClose && <button className="pf-btn" onClick={onClose} aria-label="Close chat"><X size={14} /></button>}
-      </div>
-
-      <div className="pf-ai-messages" ref={listRef}>
-        {messages.length === 0 && (
-          <div className="pf-ai-empty">
-            <p>Ask about my projects, skills, or how to get in touch — answers are grounded in what's actually on this site.</p>
-            <div className="pf-ai-suggestions">
-              {AI_SUGGESTIONS.map((s, i) => <button key={i} type="button" className="pf-ai-chip" onClick={() => submit(s)}>{s}</button>)}
-            </div>
-          </div>
-        )}
-        {messages.map((m, i) => m.role === "user" ? (
-          <div key={i} className="pf-ai-msg-user">{m.content}</div>
-        ) : (
-          <div key={i} className="pf-ai-msg-assistant">
-            <div className="pf-ai-msg-assistant-icon">&gt;_</div>
-            <div className="pf-ai-msg-assistant-text">{m.content}</div>
-          </div>
-        ))}
-        {loading && (
-          <div className="pf-ai-msg-assistant">
-            <div className="pf-ai-msg-assistant-icon">&gt;_</div>
-            <div className="pf-ai-typing"><span /><span /><span /></div>
-          </div>
-        )}
-      </div>
-
-      {isOffline && (
-        <div className="pf-ai-offline-note">
-          My AI runs on my own PC to stay free and private — it's offline right now. Try again later, or use the Contact page.
-        </div>
-      )}
-
-      <div className={`pf-ai-input-row ${isOffline ? "disabled" : ""}`}>
-        <input
-          className="pf-ai-input"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder={isOffline ? "Unavailable right now…" : "Message Niyon AI…"}
-          disabled={isOffline || loading}
-        />
-        <button className="pf-ai-send" onClick={() => submit()} disabled={isOffline || loading || !draft.trim()} aria-label="Send message">
-          <Send size={13} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AiWidget({ route, setRoute, aiState }) {
-  const { messages, status, loading, send } = aiState;
-  const [open, setOpen] = useState(false);
-  if (route.page === "ai" || route.page === "admin") return null;
-  return (
-    <>
-      {open ? (
-        <AiChatPanel variant="floating" messages={messages} status={status} loading={loading} onSend={send} onClose={() => setOpen(false)} />
-      ) : (
-        <button type="button" className="pf-ai-trigger" onClick={() => setOpen(true)}>
-          <span className={`pf-status-dot-ai ${status}`} />
-          &gt;_ ask niyon.ai
-        </button>
-      )}
-    </>
-  );
-}
-
-function AiPage({ aiState }) {
-  const { messages, status, loading, send } = aiState;
-  return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 60px", display: "flex", justifyContent: "center" }}>
-      <AiChatPanel variant="inline" messages={messages} status={status} loading={loading} onSend={send} />
-    </div>
-  );
-}
-
-
 const AiBadge = ({ used }) => (
   <span className={`pf-badge ${used ? "yes" : "no"}`}>
     <span className="pf-dot" style={{ background: used ? "#FF9F43" : "#38D9A9" }} />
@@ -1046,17 +792,15 @@ const ProjectCard = React.memo(function ProjectCard({ project, onOpen, index = 0
   );
 });
 
-function Nav({ route, setRoute, meta, aiStatus }) {
+function Nav({ route, setRoute, meta }) {
   const navScrollRef = useRef(null);
   const navScrollThumbRef = useRef(null);
   const navDragRef = useRef(null);
   const tabs = [
-    { id: "ai", label: "AI", isAi: true },
-    { id: "__div1", divider: true },
-    ...CATEGORIES.map((c) => ({ id: c.id, label: c.short, icon: c.icon, category: c.id })),
-    { id: "__div2", divider: true },
+    ...CATEGORIES.map((c) => ({ id: c.id, label: c.short, icon: c.icon })),
     { id: "skills", label: "SKILLS" },
     { id: "about", label: "ABOUT" },
+    { id: "contact", label: "CONTACT" },
   ];
   useEffect(() => {
     if (navScrollRef.current) {
@@ -1105,17 +849,15 @@ function Nav({ route, setRoute, meta, aiStatus }) {
           <Terminal size={16} color="var(--accent)" /> {meta.name}
         </div>
         <div ref={navScrollRef} onScroll={updateNavScroll} className="pf-scrollbar" style={{ display: "flex", gap: 4, overflowX: "auto", flex: 1, justifyContent: "center" }}>
-          {tabs.map((t) =>
-            t.divider ? (
-              <span key={t.id} className="pf-nav-divider" aria-hidden="true" />
-            ) : (
-              <button key={t.id} className={`pf-nav-tab ${t.isAi ? "ai-tab" : ""} ${t.category ? (route.page === "work" && route.category === t.id ? "active" : "") : (route.page === t.id ? "active" : "")}`} onClick={() => (t.category !== undefined ? setRoute({ page: "work", category: t.id }) : setRoute({ page: t.id }))}>
-                {t.isAi && <span className={`pf-status-dot-ai ${aiStatus}`} />}
+          {tabs.map((t, index) => (
+            <React.Fragment key={t.id}>
+              {index === CATEGORIES.length && <span className="pf-nav-divider" aria-hidden="true" />}
+              <button key={t.id} className={`pf-nav-tab ${index >= CATEGORIES.length ? "secondary-nav" : ""} ${route.page === t.id ? "active" : ""}`} onClick={() => setRoute({ page: t.id })}>
                 {t.icon && <t.icon size={13} strokeWidth={1.75} />}
                 {t.label}
               </button>
-            )
-          )}
+            </React.Fragment>
+          ))}
         </div>
         <div className="pf-mobile-scrollbar" onClick={seekNavScroll} aria-hidden="true">
           <span ref={navScrollThumbRef} className="pf-mobile-scrollbar-thumb" onPointerDown={startNavDrag} onPointerMove={moveNavDrag} onPointerUp={endNavDrag} onPointerCancel={endNavDrag} onClick={(event) => event.stopPropagation()} />
@@ -1149,6 +891,7 @@ function getObjectPosition(position) {
 
 function Home({ meta, projects, setRoute, openProject }) {
   const featured = projects.slice(0, 4);
+  const firstCategory = CATEGORIES[0]?.id || "games";
   const skillsPreview = meta.skills.flatMap((g) => g.items).slice(0, 14);
   const profile = getProfileImageConfig(meta);
   const disciplineCount = new Set(projects.map((project) => project.category).filter(Boolean)).size;
@@ -1162,8 +905,8 @@ function Home({ meta, projects, setRoute, openProject }) {
           <p className="pf-tagline">{meta.tagline}</p>
           <p className="pf-lead">{meta.bio}</p>
           <div className="pf-actions">
-            <button type="button" className="pf-btn primary" onClick={() => setRoute({ page: "work" })}><span>View Work</span> <ArrowRight size={14} /></button>
-            <button type="button" className="pf-btn" onClick={() => setRoute({ page: "about" })}>Contact</button>
+            <button type="button" className="pf-btn primary" onClick={() => setRoute({ page: firstCategory })}><span>View Work</span> <ArrowRight size={14} /></button>
+            <button type="button" className="pf-btn" onClick={() => setRoute({ page: "contact" })}>Contact</button>
           </div>
           <div className="pf-stats" aria-label="Portfolio statistics">
             <div className="pf-stat"><span className="pf-stat-value">{String(projects.length).padStart(2, "0")}</span><span className="pf-stat-label">Projects</span></div>
@@ -1191,7 +934,7 @@ function Home({ meta, projects, setRoute, openProject }) {
       <section className="pf-home-section">
         <div className="pf-section-header">
           <div className="pf-mono pf-section-label">// Selected Work</div>
-          <button type="button" className="pf-nav-tab" onClick={() => setRoute({ page: "work" })}>View all <ArrowRight size={12} /></button>
+          <button type="button" className="pf-nav-tab" onClick={() => setRoute({ page: firstCategory })}>View all <ArrowRight size={12} /></button>
         </div>
         <div className="pf-feature-grid">
           {featured.length === 0 && <div className="pf-empty">No projects yet — add some from the admin panel.</div>}
@@ -1207,7 +950,7 @@ function Home({ meta, projects, setRoute, openProject }) {
           {CATEGORIES.map((c) => {
             const count = projects.filter((p) => p.category === c.id).length;
             return (
-              <button type="button" key={c.id} className="pf-capability-card" onClick={() => setRoute({ page: "work", category: c.id })}>
+              <button type="button" key={c.id} className="pf-capability-card" onClick={() => setRoute({ page: c.id })}>
                 <div className="pf-capability-topline"><c.icon size={14} /><span className="pf-mono">{c.short}</span></div>
                 <strong>{c.label}</strong>
                 <span>{count} project{count === 1 ? "" : "s"}</span>
@@ -1257,47 +1000,27 @@ function Footer({ meta }) {
   );
 }
 
-function WorkPage({ initialCategory, projects, openProject, setRoute, meta }) {
-  const [category, setCategory] = useState(initialCategory || "all");
-  const [aiFilter, setAiFilter] = useState("all");
-
-  useEffect(() => { setCategory(initialCategory || "all"); }, [initialCategory]);
-
-  let items = category === "all" ? projects : projects.filter((p) => p.category === category);
-  if (aiFilter === "ai") items = items.filter((p) => p.ai_used);
-  if (aiFilter === "manual") items = items.filter((p) => !p.ai_used);
+function CategoryPage({ catId, projects, openProject, setRoute, meta }) {
+  const [filter, setFilter] = useState("all");
+  const cat = CATEGORIES.find((c) => c.id === catId);
+  let items = projects.filter((p) => p.category === catId);
+  if (filter === "ai") items = items.filter((p) => p.ai_used);
+  if (filter === "manual") items = items.filter((p) => !p.ai_used);
   items = [...items].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-
-  const activeCat = CATEGORIES.find((c) => c.id === category);
 
   return (
     <div style={{ maxWidth: 1440, margin: "0 auto", padding: "40px 24px 60px" }}>
       <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 18 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
       <div className="pf-page-header">
-        <div className="pf-page-header-label">
-          {activeCat ? <activeCat.icon size={18} /> : <Sparkles size={18} />}
-          <span className="pf-mono">{activeCat ? activeCat.short : "ALL WORK"}</span>
-        </div>
-        <h2>{activeCat ? activeCat.label : "All Work"}</h2>
+        <div className="pf-page-header-label"><cat.icon size={18} /> <span className="pf-mono">{cat.short}</span></div>
+        <h2>{cat.label}</h2>
       </div>
-
       <div className="pf-filter-row">
-        {category !== "other" && (
-          <button type="button" className={`pf-nav-tab ${category === "all" ? "active" : ""}`} onClick={() => setCategory("all")}>All</button>
-        )}
-        {CATEGORIES.filter((c) => !(category === "other" && c.id === "other")).map((c) => (
-          <button key={c.id} type="button" className={`pf-nav-tab ${category === c.id ? "active" : ""}`} onClick={() => setCategory(c.id)}>
-            <c.icon size={12} strokeWidth={1.75} /> {c.label}
-          </button>
-        ))}
-      </div>
-      <div className="pf-filter-row" style={{ marginTop: 8 }}>
         {[["all", "All"], ["ai", "AI-assisted"], ["manual", "No AI"]].map(([id, label]) => (
-          <button key={id} type="button" className={`pf-nav-tab secondary-nav ${aiFilter === id ? "active" : ""}`} onClick={() => setAiFilter(id)}>{label}</button>
+          <button key={id} type="button" className={`pf-nav-tab ${filter === id ? "active" : ""}`} onClick={() => setFilter(id)}>{label}</button>
         ))}
       </div>
-
-      {items.length === 0 ? <div className="pf-empty">No projects match these filters yet.</div> : (
+      {items.length === 0 ? <div className="pf-empty">No projects in this category yet.</div> : (
         <div className="pf-project-grid">{items.map((p, i) => <ProjectCard key={p.id} project={p} onOpen={openProject} index={i} />)}</div>
       )}
       <Footer meta={meta} />
@@ -1413,14 +1136,6 @@ function SkillsPage({ meta, setRoute }) {
 
 function AboutPage({ meta, setRoute }) {
   const profile = getProfileImageConfig(meta);
-  const rows = [
-    { icon: Mail, label: "Email", value: meta.email, href: meta.email ? `mailto:${meta.email}` : null },
-    { icon: Github, label: "GitHub", value: meta.links.github, href: meta.links.github || null },
-    { icon: Linkedin, label: "LinkedIn", value: meta.links.linkedin, href: meta.links.linkedin || null },
-    { icon: Globe, label: "Itch.io", value: meta.links.itch, href: meta.links.itch || null },
-    { icon: Globe, label: "ArtStation", value: meta.links.artstation, href: meta.links.artstation || null },
-    { icon: Globe, label: "Other", value: meta.links.other, href: meta.links.other || null },
-  ].filter((r) => r.value);
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 60px" }}>
       <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
@@ -1441,21 +1156,37 @@ function AboutPage({ meta, setRoute }) {
           <p>{meta.bio}</p>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div style={{ marginTop: 48 }}>
-        <div className="pf-mono pf-section-label" style={{ marginBottom: 16 }}>// Contact</div>
-        {rows.length === 0 && <div className="pf-empty">Add your contact links from the admin panel.</div>}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {rows.map((r, i) => (
-            <a key={i} href={r.href} target="_blank" rel="noreferrer" className="pf-card pf-contact-item" style={{ display: "flex", alignItems: "center", gap: 14, padding: 18, textDecoration: "none", color: "var(--text)" }}>
-              <r.icon size={18} color="var(--accent)" />
-              <div>
-                <div className="pf-mono" style={{ fontSize: 10, color: "var(--muted)" }}>{r.label.toUpperCase()}</div>
-                <div style={{ fontSize: 15 }}>{r.value}</div>
-              </div>
-            </a>
-          ))}
-        </div>
+function ContactPage({ meta, setRoute }) {
+  const rows = [
+    { icon: Mail, label: "Email", value: meta.email, href: meta.email ? `mailto:${meta.email}` : null },
+    { icon: Github, label: "GitHub", value: meta.links.github, href: meta.links.github || null },
+    { icon: Linkedin, label: "LinkedIn", value: meta.links.linkedin, href: meta.links.linkedin || null },
+    { icon: Globe, label: "Itch.io", value: meta.links.itch, href: meta.links.itch || null },
+    { icon: Globe, label: "ArtStation", value: meta.links.artstation, href: meta.links.artstation || null },
+    { icon: Globe, label: "Other", value: meta.links.other, href: meta.links.other || null },
+  ].filter((r) => r.value);
+  return (
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 60px" }}>
+      <button className="pf-nav-tab" style={{ paddingLeft: 0, marginBottom: 20 }} onClick={() => setRoute({ page: "home" })}><ChevronLeft size={12} /> Back</button>
+      <div className="pf-page-header" style={{ marginBottom: 24 }}>
+        <div className="pf-page-header-label"><Mail size={16} /> <span className="pf-mono">Contact</span></div>
+        <h2>Let’s build something thoughtful.</h2>
+      </div>
+      {rows.length === 0 && <div className="pf-empty">Add your contact links from the admin panel.</div>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {rows.map((r, i) => (
+          <a key={i} href={r.href} target="_blank" rel="noreferrer" className="pf-card pf-contact-item" style={{ display: "flex", alignItems: "center", gap: 14, padding: 18, textDecoration: "none", color: "var(--text)" }}>
+            <r.icon size={18} color="var(--accent)" />
+            <div>
+              <div className="pf-mono" style={{ fontSize: 10, color: "var(--muted)" }}>{r.label.toUpperCase()}</div>
+              <div style={{ fontSize: 15 }}>{r.value}</div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   );
@@ -1966,10 +1697,6 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [loadErr, setLoadErr] = useState("");
 
-  const [aiMessages, setAiMessages] = useState([]);
-  const [aiStatus, setAiStatus] = useState("checking");
-  const [aiLoading, setAiLoading] = useState(false);
-
   useEffect(() => {
     if (!CONFIGURED) { setLoaded(true); return; }
     (async () => {
@@ -1996,38 +1723,6 @@ export default function App() {
     })();
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    const poll = async () => {
-      const result = await fetchAiStatus();
-      if (!cancelled) setAiStatus(result.status || "offline");
-    };
-    poll();
-    const interval = setInterval(poll, 45000);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, []);
-
-  const sendAiMessage = useCallback(async (text) => {
-    setAiMessages((prev) => {
-      const next = [...prev, { role: "user", content: text }];
-      (async () => {
-        setAiLoading(true);
-        try {
-          const data = await sendAiChat(next);
-          setAiStatus(data.backend === "local" ? "local" : "cloud");
-          setAiMessages((cur) => [...cur, { role: "assistant", content: data.reply }]);
-        } catch {
-          setAiStatus("offline");
-          setAiMessages((cur) => [...cur, { role: "assistant", content: "I couldn't reach either backend just now. Try again in a bit, or use the Contact page." }]);
-        }
-        setAiLoading(false);
-      })();
-      return next;
-    });
-  }, []);
-
-  const aiState = { messages: aiMessages, status: aiStatus, loading: aiLoading, send: sendAiMessage };
-
   const wrappedSetProjects = useCallback((p) => setProjects(p), []);
   const wrappedSetMeta = useCallback((m) => setMeta(m), []);
 
@@ -2042,7 +1737,7 @@ export default function App() {
   return (
     <div className="pf-root">
       <GlobalStyle />
-      <Nav route={route} setRoute={setRoute} meta={meta} aiStatus={aiStatus} />
+      <Nav route={route} setRoute={setRoute} meta={meta} />
       {!CONFIGURED && (
         <div className="pf-mono" style={{ background: "var(--ai-yes-soft)", color: "var(--ai-yes)", padding: "10px 20px", fontSize: 12, textAlign: "center" }}>
           Supabase not connected — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of the code.
@@ -2051,15 +1746,13 @@ export default function App() {
       {loadErr && <div className="pf-mono" style={{ background: "rgba(255,106,106,0.1)", color: "#FF6A6A", padding: "10px 20px", fontSize: 12, textAlign: "center" }}>Couldn't load data: {loadErr}</div>}
       <div key={route.page} className="pf-page-transition">
         {route.page === "home" && <Home meta={meta} projects={projects} setRoute={setRoute} openProject={setActiveProject} />}
-        {route.page === "work" && <WorkPage initialCategory={route.category || "all"} projects={projects} openProject={setActiveProject} setRoute={setRoute} meta={meta} />}
-        {CATEGORIES.some((c) => c.id === route.page) && <WorkPage initialCategory={route.page} projects={projects} openProject={setActiveProject} setRoute={setRoute} meta={meta} />}
+        {CATEGORIES.some((c) => c.id === route.page) && <CategoryPage catId={route.page} projects={projects} openProject={setActiveProject} setRoute={setRoute} meta={meta} />}
         {route.page === "skills" && <SkillsPage meta={meta} setRoute={setRoute} />}
         {route.page === "about" && <AboutPage meta={meta} setRoute={setRoute} />}
-        {route.page === "ai" && <AiPage aiState={aiState} />}
+        {route.page === "contact" && <ContactPage meta={meta} setRoute={setRoute} />}
         {route.page === "admin" && <Admin projects={projects} setProjects={wrappedSetProjects} meta={meta} setMeta={wrappedSetMeta} />}
       </div>
       <ProjectModal project={activeProject} onClose={() => setActiveProject(null)} />
-      <AiWidget route={route} setRoute={setRoute} aiState={aiState} />
     </div>
   );
 }
